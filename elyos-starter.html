@@ -1,0 +1,2370 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, viewport-fit=cover">
+<title>Elyos Starter — Prototype</title>
+<style>
+/* ============================================================
+   ELYOS STARTER — DESIGN SYSTEM
+   Noir profond · titane · argent brossé · blanc · or discret
+   Esprit : horlogerie / blueprint / ingénierie · précision · contrôle
+   ============================================================ */
+:root{
+  --noir:#08090A;
+  --noir-2:#0C0E10;
+  --surface:#101316;
+  --surface-2:#15191D;
+  --surface-3:#1B2024;
+  --titane:#2A2F35;
+  --titane-2:#363C44;
+  --line:rgba(160,172,184,.10);
+  --line-2:rgba(160,172,184,.16);
+  --argent:#7F8893;
+  --argent-2:#A7B0BB;
+  --blanc:#EDF1F4;
+  --or:#C8B49A;
+  --or-bright:#E0CDB3;
+  --or-dim:rgba(200,180,154,.14);
+  --or-glow:rgba(200,180,154,.30);
+  --green:#7FB89A;
+  --red:#C58A82;
+  --radius:18px;
+  --radius-sm:12px;
+  --ease:cubic-bezier(.22,.61,.36,1);
+  --mono:ui-monospace,"SF Mono","JetBrains Mono","Roboto Mono",Menlo,Consolas,monospace;
+  --sans:-apple-system,BlinkMacSystemFont,"SF Pro Display","SF Pro Text",system-ui,"Segoe UI",Roboto,sans-serif;
+}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
+html,body{margin:0;padding:0;height:100%;}
+body{
+  font-family:var(--sans);
+  background:#050607;
+  color:var(--blanc);
+  -webkit-font-smoothing:antialiased;
+  text-rendering:optimizeLegibility;
+  display:flex;align-items:center;justify-content:center;
+  min-height:100dvh;
+  /* blueprint backdrop on desktop */
+  background-image:
+    linear-gradient(rgba(160,172,184,.025) 1px,transparent 1px),
+    linear-gradient(90deg,rgba(160,172,184,.025) 1px,transparent 1px),
+    radial-gradient(120% 80% at 50% -10%,rgba(200,180,154,.05),transparent 60%);
+  background-size:34px 34px,34px 34px,100% 100%;
+}
+button{font-family:inherit;color:inherit;cursor:pointer;border:none;background:none;}
+input{font-family:inherit;}
+::selection{background:var(--or-dim);}
+::-webkit-scrollbar{width:0;height:0;}
+
+/* ---------- PHONE SHELL ---------- */
+.phone{
+  position:relative;
+  width:100%;max-width:412px;height:100dvh;max-height:896px;
+  background:var(--noir);
+  overflow:hidden;
+  display:flex;flex-direction:column;
+  box-shadow:0 40px 120px rgba(0,0,0,.7),0 0 0 1px rgba(160,172,184,.07);
+}
+@media(min-width:480px){
+  .phone{border-radius:42px;height:min(896px,94dvh);box-shadow:0 50px 140px rgba(0,0,0,.8),0 0 0 1px rgba(160,172,184,.10),0 0 0 11px #0c0d0f,0 0 0 12px rgba(160,172,184,.06);}
+}
+.statusbar{
+  height:env(safe-area-inset-top,12px);min-height:12px;
+  flex:0 0 auto;background:var(--noir);
+}
+#app{flex:1 1 auto;min-height:0;display:flex;flex-direction:column;overflow:hidden;}
+
+/* ---------- TOPBAR ---------- */
+.topbar{
+  flex:0 0 auto;
+  padding:14px 20px 12px;
+  display:flex;align-items:center;justify-content:space-between;
+  background:linear-gradient(var(--noir),rgba(8,9,10,.0));
+  position:relative;z-index:5;
+}
+.wordmark{display:flex;align-items:center;gap:9px;}
+.wordmark .glyph{
+  width:18px;height:18px;border-radius:50%;
+  border:1.5px solid var(--or);position:relative;flex:0 0 auto;
+}
+.wordmark .glyph::after{content:"";position:absolute;inset:5px;border-radius:50%;background:var(--or);}
+.wordmark .name{font-size:15px;font-weight:600;letter-spacing:.26em;padding-left:.1em;}
+.topbar .sub{font:500 10px/1 var(--mono);letter-spacing:.18em;color:var(--argent);text-transform:uppercase;margin-top:4px;}
+.avatar{
+  width:34px;height:34px;border-radius:50%;flex:0 0 auto;
+  background:linear-gradient(140deg,#23282d,#14171a);
+  border:1px solid var(--line-2);
+  display:grid;place-items:center;font:600 13px var(--sans);color:var(--argent-2);
+}
+
+/* ---------- SCREEN / SCROLL ---------- */
+.view{flex:1 1 auto;overflow-y:auto;overflow-x:hidden;-webkit-overflow-scrolling:touch;}
+.scroll{padding:4px 18px 120px;animation:fade .4s var(--ease);}
+@keyframes fade{from{opacity:0;transform:translateY(8px);}to{opacity:1;transform:none;}}
+@media(prefers-reduced-motion:reduce){*{animation-duration:.01ms!important;transition-duration:.01ms!important;}}
+
+/* ---------- TYPE UTILITIES ---------- */
+.eyebrow{font:500 10px/1.2 var(--mono);letter-spacing:.22em;text-transform:uppercase;color:var(--argent);}
+.h1{font-size:25px;font-weight:600;letter-spacing:-.02em;margin:2px 0 0;}
+.h2{font-size:18px;font-weight:600;letter-spacing:-.01em;margin:0;}
+.muted{color:var(--argent);}
+.mono{font-family:var(--mono);}
+.section-head{display:flex;align-items:baseline;justify-content:space-between;margin:26px 2px 12px;}
+.section-head .link{font:500 11px var(--mono);letter-spacing:.1em;color:var(--or);text-transform:uppercase;}
+
+/* ---------- CARD (blueprint plate) ---------- */
+.card{
+  position:relative;
+  background:linear-gradient(180deg,var(--surface),var(--noir-2));
+  border:1px solid var(--line);
+  border-radius:var(--radius);
+  padding:18px;
+}
+.card.tick::before,.card.tick::after{
+  content:"";position:absolute;width:9px;height:9px;border:1px solid var(--line-2);
+  pointer-events:none;
+}
+.card.tick::before{top:9px;left:9px;border-right:none;border-bottom:none;}
+.card.tick::after{bottom:9px;right:9px;border-left:none;border-top:none;}
+
+/* ---------- ALIGNMENT RING (signature) ---------- */
+.dial-wrap{display:flex;flex-direction:column;align-items:center;padding:8px 0 4px;}
+.dial{position:relative;width:230px;height:230px;}
+.dial svg{width:100%;height:100%;transform:rotate(-90deg);}
+.dial .face{
+  position:absolute;inset:0;display:flex;flex-direction:column;
+  align-items:center;justify-content:center;text-align:center;
+}
+.dial .pct{font:600 52px/1 var(--mono);letter-spacing:-.03em;color:var(--blanc);}
+.dial .pct sup{font-size:20px;color:var(--or);font-weight:500;top:-1.4em;}
+.dial .lbl{font:500 10px/1 var(--mono);letter-spacing:.24em;color:var(--argent);text-transform:uppercase;margin-top:9px;}
+.dial .day{font:500 11px var(--mono);letter-spacing:.06em;color:var(--argent-2);margin-top:4px;}
+.arc-track{stroke:var(--titane);}
+.arc-day{stroke:var(--titane-2);}
+.arc-fill{stroke:var(--or);transition:stroke-dashoffset 1s var(--ease);filter:drop-shadow(0 0 5px var(--or-glow));}
+.tickmark{stroke:var(--titane-2);}
+.tickmark.maj{stroke:var(--argent);}
+
+/* ---------- PROGRESS BAR ---------- */
+.bar{height:4px;border-radius:4px;background:var(--titane);overflow:hidden;}
+.bar > i{display:block;height:100%;border-radius:4px;background:var(--or);transition:width .7s var(--ease);}
+.bar.green > i{background:var(--green);}
+.bar.silver > i{background:var(--argent-2);}
+.bar.gold > i{background:linear-gradient(90deg,var(--or-dim),var(--or-bright,var(--or)));}
+.objdual{display:grid;grid-template-columns:1fr 1fr;gap:18px;}
+.objdual .gz{min-width:0;}
+.gz-k{font:500 9.5px var(--mono);letter-spacing:.13em;text-transform:uppercase;color:var(--argent);}
+.gz-v{font:600 30px/1 var(--mono);color:var(--blanc);letter-spacing:-.03em;margin:8px 0 4px;}
+.gz-v.gold{color:var(--or);}
+.gz-s{font-size:12.5px;color:var(--argent-2);line-height:1.35;}
+.align-sub{display:flex;align-items:center;gap:10px;margin-top:16px;padding-top:14px;border-top:1px solid var(--line);flex-wrap:wrap;}
+.align-pill{display:inline-flex;align-items:center;gap:6px;font:600 11px var(--mono);letter-spacing:.02em;color:var(--argent-2);background:var(--surface-2);border:1px solid var(--line);border-radius:20px;padding:5px 11px;}
+.align-pill.off{color:var(--argent);opacity:.7;}
+.align-dot{width:6px;height:6px;border-radius:50%;background:var(--argent-2);}
+.align-pill.off .align-dot{background:var(--titane-2);}
+.align-detail{font-size:11px;color:var(--argent);}
+.objline{display:flex;justify-content:space-between;align-items:flex-end;margin:14px 0 2px;}
+.mono.v1{font:600 30px/1 var(--mono);color:var(--or);letter-spacing:-.03em;}
+.mono.v2{font:500 18px var(--mono);color:var(--argent-2);}
+.actrow{display:flex;align-items:center;gap:13px;padding:13px 0;border-bottom:1px solid var(--line);}
+.actrow:last-of-type{border-bottom:none;}
+.actrow .check{width:26px;height:26px;border-radius:8px;border:1.5px solid var(--titane-2);display:grid;place-items:center;flex:0 0 auto;cursor:pointer;transition:.2s;}
+.actrow .check svg{width:14px;height:14px;opacity:0;transition:.2s;}
+.actrow.done .check{background:var(--or);border-color:var(--or);}
+.actrow.done .check svg{opacity:1;}
+.actrow .ab{flex:1;min-width:0;cursor:pointer;}
+.actrow .ab .t{font-size:14.5px;font-weight:500;color:var(--blanc);}
+.actrow.done .ab .t{color:var(--argent-2);text-decoration:line-through;text-decoration-color:var(--titane-2);}
+.actrow .ab .meta{font:500 10.5px var(--mono);letter-spacing:.04em;color:var(--argent);margin-top:3px;}
+.actrow .actdel{width:28px;height:28px;border-radius:8px;background:transparent;border:none;color:var(--argent);display:grid;place-items:center;flex:0 0 auto;transition:.2s;}
+.actrow .actdel:active{background:var(--surface-2);color:var(--red);}
+.actrow .actdel svg{width:14px;height:14px;}
+.rstep .actdel{width:26px;height:26px;border-radius:7px;background:transparent;border:none;color:var(--argent);display:grid;place-items:center;flex:0 0 auto;margin-left:auto;}
+.rstep .actdel svg{width:13px;height:13px;}
+
+/* ---------- OBJECTIVE ROW ---------- */
+.obj{padding:14px 0;border-bottom:1px solid var(--line);cursor:pointer;}
+.obj:last-child{border-bottom:none;}
+.obj .top{display:flex;align-items:center;justify-content:space-between;margin-bottom:9px;gap:12px;}
+.obj .name{font-size:14.5px;font-weight:500;}
+.obj .dom{font:500 9px var(--mono);letter-spacing:.16em;text-transform:uppercase;color:var(--argent);}
+.obj .val{font:600 13px var(--mono);color:var(--or);}
+.type-tag{font:500 8.5px var(--mono);letter-spacing:.12em;text-transform:uppercase;color:var(--argent);border:1px solid var(--line-2);padding:2px 6px;border-radius:5px;}
+
+/* ---------- ACTION ITEM ---------- */
+.action{
+  display:flex;align-items:center;gap:13px;padding:14px 16px;
+  border:1px solid var(--line);border-radius:var(--radius-sm);
+  margin-bottom:9px;background:var(--surface);transition:.25s var(--ease);cursor:pointer;
+}
+.action:active{transform:scale(.985);}
+.action.done{background:var(--noir-2);border-color:transparent;}
+.check{
+  width:23px;height:23px;border-radius:7px;border:1.5px solid var(--titane-2);
+  flex:0 0 auto;display:grid;place-items:center;transition:.2s var(--ease);
+}
+.action.done .check{background:var(--or);border-color:var(--or);}
+.check svg{width:12px;height:12px;opacity:0;transform:scale(.4);transition:.2s var(--ease);}
+.action.done .check svg{opacity:1;transform:scale(1);}
+.action .body{flex:1 1 auto;min-width:0;}
+.action .t{font-size:14.5px;font-weight:500;transition:.25s;}
+.action.done .t{color:var(--argent);text-decoration:line-through;text-decoration-color:var(--titane-2);}
+.action .meta{font:500 10px var(--mono);letter-spacing:.06em;color:var(--argent);margin-top:3px;display:flex;gap:8px;align-items:center;}
+.chev{color:var(--titane-2);flex:0 0 auto;}
+.action.grouped .check{border-radius:50%;}
+
+/* routine inline summary on action */
+.mini{font:600 11px var(--mono);color:var(--argent-2);flex:0 0 auto;}
+
+/* ---------- QUICK ACTIONS ---------- */
+.quick{display:grid;grid-template-columns:repeat(3,1fr);gap:9px;}
+.qa{
+  border:1px solid var(--line);border-radius:var(--radius-sm);background:var(--surface);
+  padding:14px 8px;display:flex;flex-direction:column;align-items:center;gap:8px;
+  transition:.2s var(--ease);
+}
+.qa:active{transform:scale(.95);background:var(--surface-2);}
+.qa svg{width:21px;height:21px;color:var(--argent-2);}
+.qa span{font-size:10.5px;font-weight:500;color:var(--argent-2);text-align:center;line-height:1.25;}
+
+/* ---------- CHIPS / SEGMENTED ---------- */
+.chips{display:flex;flex-wrap:wrap;gap:8px;}
+.chip{
+  font:500 12px var(--sans);padding:8px 13px;border-radius:999px;
+  border:1px solid var(--line-2);color:var(--argent-2);background:var(--surface);transition:.2s;
+}
+.chip.on{background:var(--or);color:#1A1206;border-color:var(--or);font-weight:600;}
+.chip.dom{font-family:var(--mono);font-size:10px;letter-spacing:.12em;text-transform:uppercase;padding:5px 10px;}
+.seg{display:flex;background:var(--noir-2);border:1px solid var(--line);border-radius:11px;padding:3px;gap:3px;}
+.seg button{flex:1;padding:8px;border-radius:8px;font:500 11.5px var(--mono);letter-spacing:.05em;color:var(--argent);transition:.2s;}
+.seg button.on{background:var(--surface-3);color:var(--blanc);box-shadow:0 1px 0 rgba(255,255,255,.04) inset;}
+
+/* ---------- BUTTONS ---------- */
+.btn{
+  width:100%;padding:15px;border-radius:13px;font-size:15px;font-weight:600;
+  display:flex;align-items:center;justify-content:center;gap:8px;transition:.2s var(--ease);
+}
+.btn:active{transform:scale(.98);}
+.btn-primary{background:var(--or);color:#15100A;}
+.btn-primary:active{background:var(--or-bright);}
+.btn-ghost{background:var(--surface);border:1px solid var(--line-2);color:var(--blanc);}
+.btn-line{background:transparent;border:1px solid var(--or);color:var(--or);}
+.btn-sm{padding:11px 14px;font-size:13px;border-radius:10px;width:auto;}
+.btn svg{width:17px;height:17px;flex:0 0 auto;}
+.btn-sm svg{width:14px;height:14px;}
+.chip svg{width:12px;height:12px;flex:0 0 auto;vertical-align:-1px;}
+
+/* ---------- BOTTOM NAV ---------- */
+.nav{
+  flex:0 0 auto;position:relative;z-index:6;
+  display:flex;justify-content:space-around;align-items:center;
+  padding:10px 8px calc(10px + env(safe-area-inset-bottom,8px));
+  background:rgba(8,9,10,.86);backdrop-filter:blur(20px);
+  border-top:1px solid var(--line);
+}
+.nav button{display:flex;flex-direction:column;align-items:center;gap:5px;padding:4px 10px;position:relative;flex:1;}
+.nav svg{width:22px;height:22px;color:var(--argent);transition:.2s;stroke-width:1.6;}
+.nav span{font:500 9px var(--mono);letter-spacing:.08em;color:var(--argent);transition:.2s;text-transform:uppercase;}
+.nav button.on svg{color:var(--or);}
+.nav button.on span{color:var(--blanc);}
+.nav button.on::before{content:"";position:absolute;top:-11px;width:18px;height:2px;border-radius:2px;background:var(--or);box-shadow:0 0 6px var(--or-glow);}
+
+/* ---------- SHEET (bottom modal) ---------- */
+.scrim{position:absolute;inset:0;background:rgba(2,3,4,.6);backdrop-filter:blur(3px);z-index:40;opacity:0;pointer-events:none;transition:.3s;}
+.scrim.on{opacity:1;pointer-events:auto;}
+.sheet{
+  position:absolute;left:0;right:0;bottom:0;z-index:41;
+  background:var(--noir-2);border-top:1px solid var(--line-2);
+  border-radius:26px 26px 0 0;
+  transform:translateY(110%);transition:transform .42s var(--ease);
+  max-height:90%;display:flex;flex-direction:column;
+  box-shadow:0 -20px 60px rgba(0,0,0,.6);
+}
+.sheet.on{transform:none;}
+.sheet .grab{width:38px;height:4px;border-radius:4px;background:var(--titane-2);margin:11px auto 4px;flex:0 0 auto;}
+.sheet .sh-head{padding:8px 22px 14px;display:flex;align-items:center;justify-content:space-between;flex:0 0 auto;}
+.sheet .sh-body{padding:0 22px 26px;overflow-y:auto;}
+.sh-close{width:30px;height:30px;border-radius:50%;background:var(--surface-2);display:grid;place-items:center;color:var(--argent);}
+.sh-close svg{width:18px;height:18px;}
+
+/* ---------- FIELDS ---------- */
+.field{margin-bottom:14px;}
+.field label{display:block;font:500 10px var(--mono);letter-spacing:.14em;text-transform:uppercase;color:var(--argent);margin-bottom:7px;}
+.type-hint{color:var(--or);text-transform:none;letter-spacing:0;font-size:10px;}
+.field input,.field textarea,.field select{
+  width:100%;padding:13px 14px;border-radius:11px;background:var(--surface);
+  border:1px solid var(--line-2);color:var(--blanc);font-size:15px;outline:none;transition:.2s;
+}
+.field input:focus,.field textarea:focus{border-color:var(--or);}
+.row2{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
+.row3{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;}
+
+/* stepper */
+.step-num{display:flex;align-items:center;gap:9px;border:1px solid var(--line-2);border-radius:10px;padding:6px;}
+.step-num button{width:34px;height:34px;border-radius:8px;background:var(--surface-2);font-size:18px;color:var(--argent-2);}
+.step-num .v{flex:1;text-align:center;font:600 16px var(--mono);}
+
+/* ---------- STAT GRID ---------- */
+.stats{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
+.stat{border:1px solid var(--line);border-radius:var(--radius-sm);padding:14px;background:var(--surface);}
+.stat .k{font:500 9px var(--mono);letter-spacing:.16em;text-transform:uppercase;color:var(--argent);}
+.stat .v{font:600 22px var(--mono);margin-top:6px;letter-spacing:-.02em;}
+.stat .v small{font-size:12px;color:var(--argent);font-weight:500;}
+.stat .d{font:500 10px var(--mono);margin-top:4px;}
+.up{color:var(--green);}.down{color:var(--red);}
+
+/* ---------- DOMAIN / LIST ROWS ---------- */
+.lrow{display:flex;align-items:center;gap:13px;padding:14px 0;border-bottom:1px solid var(--line);}
+.lrow:last-child{border-bottom:none;}
+.lrow .ic{width:38px;height:38px;border-radius:10px;background:var(--surface-2);display:grid;place-items:center;flex:0 0 auto;color:var(--argent-2);border:1px solid var(--line);}
+.lrow .ic svg{width:18px;height:18px;}
+.lrow .lb{flex:1;min-width:0;}
+.lrow .lb .n{font-size:14.5px;font-weight:500;}
+.lrow .lb .s{font:500 11px var(--mono);color:var(--argent);margin-top:3px;}
+.lrow .prio,.prirow .prio{width:22px;height:22px;border-radius:7px;background:var(--surface-2);border:1px solid var(--or-dim);color:var(--or);font:600 11px var(--mono);display:grid;place-items:center;flex:0 0 auto;}
+.objmini{font:500 10px var(--mono);letter-spacing:.06em;text-transform:uppercase;color:var(--argent);margin-top:7px;}
+.tgrid{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
+.tcard{background:var(--surface);border:1px solid var(--line);border-radius:16px;padding:14px 15px;cursor:pointer;transition:.2s;}
+.tcard:active{transform:scale(.985);border-color:var(--or-dim);}
+.tcard .th{display:flex;align-items:center;gap:7px;}
+.tdot{width:7px;height:7px;border-radius:50%;flex:0 0 auto;}
+.tcard .tn{font-size:13px;color:var(--argent-2);}
+.tcard .tv{margin-top:9px;font:600 16px var(--mono);color:var(--blanc);font-variant-numeric:tabular-nums;}
+.barchart{display:flex;align-items:flex-end;justify-content:space-between;gap:8px;height:108px;}
+.bcol{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:flex-end;height:100%;gap:8px;}
+.bfill{width:100%;max-width:20px;border-radius:5px;background:linear-gradient(180deg,var(--titane-2),var(--titane));transition:height .7s var(--ease);}
+.bfill.now{background:linear-gradient(180deg,var(--or-bright,var(--or)),var(--or-dim));}
+.bfill.empty{background:var(--line-2);opacity:.5;}
+.bday{font:500 10px var(--mono);color:var(--argent);}
+.bday.now{color:var(--or);}
+.dial-proof{text-align:center;margin-top:12px;font-size:12.5px;color:var(--argent-2);font-variant-numeric:tabular-nums;}
+.swipe-wrap{position:relative;overflow:hidden;border-radius:var(--radius-sm);margin-bottom:9px;}
+.swipe-actions{position:absolute;inset:0 0 0 auto;display:flex;align-items:stretch;}
+.swipe-actions button{border:none;width:75px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:5px;font:500 10px var(--mono);letter-spacing:.06em;text-transform:uppercase;}
+.swipe-actions button svg{width:16px;height:16px;}
+.sw-edit{background:var(--surface-3,var(--surface-2));color:var(--or);}
+.sw-del{background:rgba(190,60,60,.9);color:#fff;}
+.swipe-face{position:relative;z-index:1;transition:transform .26s var(--ease);background:var(--surface);margin-bottom:0!important;}
+.swipe-wrap.open .swipe-face{transform:translateX(-150px);}
+.row-menu{width:30px;height:30px;border-radius:8px;background:transparent;border:none;color:var(--argent);display:grid;place-items:center;flex:0 0 auto;}
+.row-menu svg{width:15px;height:15px;}
+.row-menu:active{background:var(--surface-2);}
+.newtag{color:var(--or);}
+.opt-field label{display:flex;align-items:center;gap:7px;}
+.opt-tag{font:500 9px var(--mono);letter-spacing:.08em;text-transform:uppercase;color:var(--argent);background:var(--surface-2);border:1px solid var(--line);border-radius:20px;padding:2px 7px;}
+.btn-danger{background:rgba(190,60,60,.92);color:#fff;border:1px solid rgba(190,60,60,.5);}
+.sys-link{text-align:center;margin-top:16px;font:500 11px var(--mono);letter-spacing:.06em;color:var(--or);cursor:pointer;}
+.streak-badge{display:flex;align-items:center;justify-content:center;gap:7px;margin-top:11px;padding:8px 12px;border-radius:20px;background:rgba(201,162,77,.09);border:1px solid var(--or-dim);}
+.streak-badge .sb-ic{display:grid;place-items:center;color:var(--or);}
+.streak-badge .sb-ic svg{width:14px;height:14px;}
+.streak-badge .sb-n{font:600 15px var(--mono);color:var(--or);font-variant-numeric:tabular-nums;}
+.streak-badge .sb-l{font-size:11.5px;color:var(--argent-2);}
+.endday-score{text-align:center;padding:8px 0 2px;}
+.endday-score .eds-v{font:600 52px/1 var(--mono);color:var(--or);letter-spacing:-.03em;font-variant-numeric:tabular-nums;}
+.endday-score .eds-v sup{font-size:20px;}
+.endday-score .eds-l{font:500 11px var(--mono);letter-spacing:.1em;text-transform:uppercase;color:var(--argent);margin-top:8px;}
+.cyc-hero{text-align:center;padding:14px 0 6px;border-bottom:1px solid var(--line);}
+.cyc-hero .ch-k{font:500 10px var(--mono);letter-spacing:.16em;text-transform:uppercase;color:var(--argent);}
+.cyc-hero .ch-v{font:600 62px/1 var(--mono);color:var(--or);letter-spacing:-.04em;margin:12px 0 6px;font-variant-numeric:tabular-nums;}
+.cyc-hero .ch-v sup{font-size:22px;}
+.cyc-hero .ch-l{font-size:12px;color:var(--argent-2);padding-bottom:14px;}
+.jrn{font:500 13px var(--mono);color:var(--argent);font-variant-numeric:tabular-nums;white-space:nowrap;}
+.jrn .jv{color:var(--blanc);font-weight:600;}
+.jrn .arw{color:var(--titane-2);margin:0 1px;}
+.mono,.val,.pct,.gz-v,.jrn,.big{font-variant-numeric:tabular-nums;}
+.heat{display:grid;grid-template-columns:repeat(10,1fr);gap:5px;}
+.heat .hc{aspect-ratio:1;border-radius:4px;border:1px solid var(--line);}
+.heatleg{display:flex;align-items:center;gap:5px;justify-content:flex-end;margin-top:12px;font:500 9px var(--mono);letter-spacing:.08em;text-transform:uppercase;color:var(--argent);}
+.heatleg i{width:11px;height:11px;border-radius:3px;border:1px solid var(--line);}
+.prilist{margin:2px 0;}
+.prirow{display:flex;align-items:center;gap:12px;padding:11px 0;border-bottom:1px solid var(--line);}
+.prirow:last-child{border-bottom:none;}
+.prirow .ic{width:34px;height:34px;border-radius:9px;background:var(--surface-2);display:grid;place-items:center;flex:0 0 auto;color:var(--argent-2);border:1px solid var(--line);}
+.prirow .ic svg{width:16px;height:16px;}
+.prirow .lb{flex:1;min-width:0;}.prirow .lb .n{font-size:14px;font-weight:500;}
+.primv{display:flex;gap:6px;flex:0 0 auto;}
+.primv button{width:30px;height:30px;border-radius:8px;background:var(--surface-2);border:1px solid var(--line);color:var(--argent-2);display:grid;place-items:center;}
+.primv button:disabled{opacity:.3;}
+.primv button svg{width:15px;height:15px;}
+.primv button:first-child svg{transform:rotate(-90deg);}
+.primv button:last-child svg{transform:rotate(90deg);}
+
+/* ---------- SYSTEM / LIBRARY CARDS ---------- */
+.sys{
+  position:relative;border:1px solid var(--line);border-radius:var(--radius);
+  background:linear-gradient(155deg,var(--surface),var(--noir-2));padding:16px;margin-bottom:12px;overflow:hidden;
+}
+.sys .badge{position:absolute;top:14px;right:14px;font:500 8.5px var(--mono);letter-spacing:.14em;text-transform:uppercase;color:var(--or);border:1px solid var(--or-dim);padding:3px 7px;border-radius:6px;}
+.sys h3{font-size:16px;font-weight:600;margin:0 70px 4px 0;}
+.sys p{font-size:12.5px;color:var(--argent);margin:0 0 13px;line-height:1.5;}
+.sys .tags{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:14px;}
+.sys .stat-line{display:flex;gap:16px;font:500 10px var(--mono);color:var(--argent);letter-spacing:.05em;}
+.sys .stat-line b{color:var(--argent-2);font-weight:600;}
+
+/* ---------- ACADEMY ---------- */
+.aca-cat{font:500 10px var(--mono);letter-spacing:.2em;text-transform:uppercase;color:var(--or);margin:24px 2px 12px;}
+.aca{border:1px solid var(--line);border-radius:var(--radius-sm);padding:15px;margin-bottom:10px;background:var(--surface);transition:.2s;}
+.aca:active{background:var(--surface-2);}
+.aca h4{font-size:14.5px;font-weight:600;margin:0 0 5px;}
+.aca .read{font:500 10px var(--mono);color:var(--argent);letter-spacing:.05em;}
+.aca .cta{margin-top:12px;padding-top:12px;border-top:1px solid var(--line);display:flex;align-items:center;gap:8px;font-size:12.5px;color:var(--or);font-weight:500;}
+.aca .cta svg{width:15px;height:15px;}
+
+/* ---------- ROUTINE STEP ---------- */
+.rstep{display:flex;align-items:center;gap:13px;padding:12px 0;border-bottom:1px solid var(--line);cursor:pointer;}
+.rstep:last-child{border-bottom:none;}
+.rstep .tm{font:600 11px var(--mono);color:var(--argent);width:42px;flex:0 0 auto;letter-spacing:.02em;}
+.rstep.done .tm{color:var(--or);}
+.rdot{width:21px;height:21px;border-radius:50%;border:1.5px solid var(--titane-2);flex:0 0 auto;display:grid;place-items:center;transition:.2s;}
+.rstep.done .rdot{background:var(--or);border-color:var(--or);}
+.rdot svg{width:11px;height:11px;opacity:0;transition:.2s;}
+.rstep.done .rdot svg{opacity:1;}
+.rstep .rl{font-size:14px;font-weight:500;flex:1;}
+.rstep.done .rl{color:var(--argent);text-decoration:line-through;text-decoration-color:var(--titane-2);}
+
+/* ---------- SPORT SETS ---------- */
+.ex{border:1px solid var(--line);border-radius:var(--radius-sm);margin-bottom:11px;background:var(--surface);overflow:hidden;}
+.ex .exh{display:flex;align-items:center;padding:13px 15px;border-bottom:1px solid var(--line);}
+.ex .exh .nm{font-size:14px;font-weight:600;flex:1;min-width:0;}
+.ex .exh .pr{font:500 10px var(--mono);color:var(--argent);}
+.setrow{display:grid;grid-template-columns:24px minmax(0,1fr) 56px 50px 32px;align-items:center;gap:8px;padding:8px 14px;border-bottom:1px solid var(--line);transition:background .2s;}
+.setrow:last-child{border-bottom:none;}
+.setrow.done{background:rgba(58,160,90,.07);}
+.setrow .sn{font:600 12px var(--mono);color:var(--argent);}
+.setrow .prev{font:500 10.5px var(--mono);color:var(--argent);text-align:center;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.setrow .cell{background:var(--noir-2);border:1px solid var(--line);border-radius:8px;padding:8px 4px;text-align:center;font:600 13px var(--mono);color:var(--blanc);width:100%;outline:none;}
+.setrow .cell:focus{border-color:var(--or);}
+.sethead{display:grid;grid-template-columns:24px minmax(0,1fr) 56px 50px 32px;gap:8px;padding:6px 14px;font:500 8.5px var(--mono);letter-spacing:.1em;text-transform:uppercase;color:var(--argent);}
+.sethead div{text-align:center;}.sethead div:first-child,.sethead div:nth-child(2){text-align:left;}
+.exgrp{font:500 9px var(--mono);letter-spacing:.1em;text-transform:uppercase;color:var(--argent);margin-left:8px;}
+.exmenu{width:26px;height:26px;border-radius:7px;background:var(--surface-2);border:none;color:var(--argent);display:grid;place-items:center;flex:0 0 auto;}
+.exmenu svg{width:13px;height:13px;}
+.restbar{position:absolute;left:16px;right:16px;bottom:calc(18px + env(safe-area-inset-bottom,0px));z-index:30;display:flex;align-items:center;justify-content:space-between;padding:11px 16px;border-radius:14px;background:rgba(18,20,23,.96);border:1px solid var(--or-dim);backdrop-filter:blur(14px);box-shadow:0 14px 44px rgba(0,0,0,.55);animation:fade .25s var(--ease);}
+.restbar .rt{font:600 14px var(--mono);color:var(--or);letter-spacing:.02em;}
+.restbar .ra{display:flex;gap:8px;}
+.restbar .ra button{font:600 10px var(--mono);letter-spacing:.08em;text-transform:uppercase;color:var(--argent);background:var(--surface-2);border:none;padding:8px 11px;border-radius:8px;}
+.liblist{max-height:48vh;overflow-y:auto;margin:0 -2px;}
+.libgrp{font:500 9px var(--mono);letter-spacing:.16em;text-transform:uppercase;color:var(--argent);padding:13px 2px 6px;}
+.libitem{display:flex;align-items:center;justify-content:space-between;padding:12px 2px;border-bottom:1px solid var(--line);}
+.libitem .t{font-size:14px;font-weight:500;}
+.libitem:active{opacity:.55;}
+.libfig{width:30px;height:44px;display:grid;place-items:center;flex:0 0 auto;margin-right:11px;opacity:.9;}
+.libfig .msvg{width:26px;height:40px;}
+.wcard{display:flex;align-items:center;gap:14px;background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);padding:14px 15px;margin-bottom:11px;cursor:pointer;transition:.2s;}
+.wcard:active{transform:scale(.99);border-color:var(--or-dim);}
+.wfig{width:52px;height:72px;border-radius:12px;background:var(--noir-2);border:1px solid var(--line);display:grid;place-items:center;flex:0 0 auto;}
+.wbody{flex:1;min-width:0;}
+.wname{font-size:16px;font-weight:600;color:var(--blanc);}
+.wmeta{font:500 11px var(--mono);color:var(--argent);margin-top:3px;}
+.wtags{display:flex;gap:5px;flex-wrap:wrap;margin-top:8px;}
+.wtag{font:500 9px var(--mono);letter-spacing:.08em;text-transform:uppercase;color:var(--or);background:rgba(201,162,77,.10);border:1px solid var(--or-dim);border-radius:20px;padding:3px 8px;}
+.wex{font-size:11.5px;color:var(--argent-2);margin-top:8px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.exfig{width:26px;height:38px;display:grid;place-items:center;flex:0 0 auto;margin-right:10px;opacity:.9;}
+.exfig .msvg{width:24px;height:36px;}
+.setdone{width:26px;height:26px;border-radius:7px;border:1.5px solid var(--titane-2);display:grid;place-items:center;transition:.2s;}
+.setdone.on{background:var(--green);border-color:var(--green);}
+.setdone svg{width:13px;height:13px;opacity:0;}.setdone.on svg{opacity:1;}
+
+/* ---------- NUTRITION RING ---------- */
+.macro{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-top:14px;}
+.macro .m{text-align:center;}
+.macro .mlbl{font:500 9px var(--mono);letter-spacing:.1em;text-transform:uppercase;color:var(--argent);margin-bottom:6px;}
+.macro .mval{font:600 13px var(--mono);margin-top:6px;}
+.meal{margin-top:16px;}
+.meal .mh{display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;}
+.meal .mh .mn{font:500 11px var(--mono);letter-spacing:.1em;text-transform:uppercase;color:var(--argent-2);}
+.fooditem{display:flex;align-items:center;justify-content:space-between;padding:11px 13px;border:1px solid var(--line);border-radius:10px;margin-bottom:7px;background:var(--surface);}
+.fooditem .fn{font-size:13.5px;font-weight:500;}
+.fooditem .fk{font:500 11px var(--mono);color:var(--argent);}
+
+/* ---------- ADDICTION ---------- */
+.streak{text-align:center;padding:10px 0;}
+.streak .big{font:600 64px/1 var(--mono);color:var(--or);letter-spacing:-.04em;}
+.streak .u{font:500 11px var(--mono);letter-spacing:.2em;text-transform:uppercase;color:var(--argent);margin-top:6px;}
+.dots{display:flex;flex-wrap:wrap;gap:5px;justify-content:center;margin:16px 0 4px;}
+.ddot{width:9px;height:9px;border-radius:2px;background:var(--titane);}
+.ddot.ok{background:var(--green);}
+.ddot.relapse{background:var(--red);}
+
+/* ---------- ONBOARDING ---------- */
+.ob{flex:1;display:flex;flex-direction:column;padding:0 24px;overflow-y:auto;}
+.ob-top{padding:18px 0 8px;flex:0 0 auto;}
+.ob-progress{display:flex;gap:6px;margin-bottom:30px;}
+.ob-progress i{flex:1;height:3px;border-radius:3px;background:var(--titane);transition:.4s;}
+.ob-progress i.on{background:var(--or);}
+.ob-body{flex:1;animation:fade .35s var(--ease);}
+.ob .step-k{font:500 10px var(--mono);letter-spacing:.22em;text-transform:uppercase;color:var(--or);}
+.ob h1{font-size:27px;font-weight:600;letter-spacing:-.025em;margin:6px 0 8px;line-height:1.15;}
+.ob .lede{font-size:14px;color:var(--argent);line-height:1.55;margin-bottom:26px;}
+.ob-foot{flex:0 0 auto;padding:14px 0 calc(20px + env(safe-area-inset-bottom,8px));}
+.ob-tip{text-align:center;font:500 11px var(--mono);letter-spacing:.1em;text-transform:uppercase;color:var(--argent);padding:15px;opacity:.7;}
+.ob-back-link{display:inline-flex;align-items:center;gap:4px;font:500 11px var(--mono);letter-spacing:.06em;color:var(--or);margin-bottom:14px;}
+.ob-back-link svg{width:12px;height:12px;transform:rotate(180deg);}
+.ob-back{background:none;color:var(--argent);margin-top:2px;font-weight:500;font-size:13px;}
+.opt{
+  border:1px solid var(--line-2);border-radius:15px;padding:17px;margin-bottom:11px;
+  display:flex;align-items:center;gap:14px;transition:.2s var(--ease);background:var(--surface);
+}
+.opt:active{transform:scale(.985);}
+.opt.on{border-color:var(--or);background:linear-gradient(var(--or-dim),transparent);}
+.opt .obadge{font:600 13px var(--mono);width:42px;height:42px;border-radius:11px;background:var(--noir-2);border:1px solid var(--line);display:grid;place-items:center;flex:0 0 auto;color:var(--argent-2);}
+.opt .obadge svg{width:18px;height:18px;}
+.opt.on .obadge{background:var(--or);color:#15100A;border-color:var(--or);}
+.opt .ob-t{font-size:15.5px;font-weight:600;}
+.opt .ob-s{font:500 11px var(--mono);color:var(--argent);margin-top:3px;letter-spacing:.03em;}
+.opt .rec{margin-left:auto;font:500 8.5px var(--mono);letter-spacing:.12em;text-transform:uppercase;color:var(--or);border:1px solid var(--or-dim);padding:3px 7px;border-radius:6px;flex:0 0 auto;}
+.elyos-mark{display:flex;flex-direction:column;align-items:center;gap:18px;padding-top:8vh;animation:fade .6s var(--ease);}
+.elyos-mark .ring{width:84px;height:84px;border-radius:50%;border:2px solid var(--or);position:relative;}
+.elyos-mark .ring::after{content:"";position:absolute;inset:24px;border-radius:50%;background:var(--or);box-shadow:0 0 24px var(--or-glow);}
+.elyos-mark .nm{font-size:24px;font-weight:600;letter-spacing:.3em;padding-left:.15em;}
+.elyos-mark .tg{font:500 11px var(--mono);letter-spacing:.18em;text-transform:uppercase;color:var(--argent);}
+
+/* ---------- TOAST ---------- */
+.toast{
+  position:absolute;left:50%;bottom:96px;transform:translate(-50%,20px);z-index:60;
+  background:var(--surface-3);border:1px solid var(--line-2);border-radius:12px;
+  padding:12px 18px;font-size:13px;font-weight:500;opacity:0;pointer-events:none;transition:.3s var(--ease);
+  display:flex;align-items:center;gap:9px;box-shadow:0 10px 30px rgba(0,0,0,.5);max-width:86%;
+}
+.toast.on{opacity:1;transform:translate(-50%,0);}
+.toast svg{width:16px;height:16px;color:var(--or);flex:0 0 auto;}
+
+/* ---------- MISC ---------- */
+.divider{height:1px;background:var(--line);margin:20px 0;}
+.note{font-size:12px;color:var(--argent);line-height:1.55;}
+.kicker{display:inline-flex;align-items:center;gap:6px;font:500 10px var(--mono);letter-spacing:.12em;text-transform:uppercase;color:var(--argent);}
+.kicker svg{width:13px;height:13px;flex:0 0 auto;}
+.dot{width:5px;height:5px;border-radius:50%;background:var(--or);display:inline-block;}
+.hint{border:1px solid var(--line);border-left:2px solid var(--or);border-radius:8px;padding:12px 14px;background:rgba(200,180,154,.04);font-size:12px;color:var(--argent-2);line-height:1.55;}
+.empty{text-align:center;padding:40px 20px;color:var(--argent);}
+.toggle{width:44px;height:26px;border-radius:14px;background:var(--titane);position:relative;transition:.25s;flex:0 0 auto;}
+.toggle.on{background:var(--or);}
+.toggle::after{content:"";position:absolute;top:3px;left:3px;width:20px;height:20px;border-radius:50%;background:#fff;transition:.25s var(--ease);}
+.toggle.on::after{transform:translateX(18px);}
+.cyc-actions{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;}
+.cyc-actions .btn{margin:0;}
+.asst-banner{display:flex;align-items:center;gap:13px;padding:15px 16px;margin-top:10px;border-radius:var(--radius);background:linear-gradient(135deg,rgba(201,162,77,.10),rgba(201,162,77,.02));border:1px solid var(--or-dim);cursor:pointer;transition:.2s;}
+.asst-banner:active{transform:scale(.99);}
+.asst-banner .ab-ic{width:38px;height:38px;border-radius:11px;background:rgba(201,162,77,.14);border:1px solid var(--or-dim);display:grid;place-items:center;color:var(--or);flex:0 0 auto;}
+.asst-banner .ab-ic svg{width:18px;height:18px;}
+.asst-banner .ab-tx{flex:1;min-width:0;}
+.asst-banner .ab-t{font-size:14.5px;font-weight:600;color:var(--blanc);}
+.asst-banner .ab-s{font-size:11.5px;color:var(--argent-2);margin-top:2px;}
+.asst-banner .chev{color:var(--or);}
+.spacer{height:6px;}
+</style>
+</head>
+<body>
+<div class="phone" id="phone">
+  <div class="statusbar"></div>
+  <div id="app"></div>
+  <div class="scrim" id="scrim" data-act="close-sheet"></div>
+  <div class="sheet" id="sheet"></div>
+  <div class="toast" id="toast"></div>
+</div>
+<script>
+/* ============================================================
+   ICONS (lucide-style, 1.6 stroke)
+   ============================================================ */
+const I = {
+  home:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M3 10.5 12 3l9 7.5"/><path d="M5 9.5V21h14V9.5"/></svg>',
+  chart:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M4 20V4"/><path d="M4 20h16"/><path d="M8 16v-4"/><path d="M13 16V8"/><path d="M18 16v-7"/></svg>',
+  layers:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="m12 3 9 5-9 5-9-5 9-5Z"/><path d="m3 13 9 5 9-5"/></svg>',
+  grid:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7" rx="1.4"/><rect x="14" y="3" width="7" height="7" rx="1.4"/><rect x="3" y="14" width="7" height="7" rx="1.4"/><rect x="14" y="14" width="7" height="7" rx="1.4"/></svg>',
+  book:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M4 5.5A2.5 2.5 0 0 1 6.5 3H20v15H6.5A2.5 2.5 0 0 0 4 20.5Z"/><path d="M4 20.5A2.5 2.5 0 0 1 6.5 18H20v3H6.5A2.5 2.5 0 0 1 4 20.5Z"/></svg>',
+  check:'<svg viewBox="0 0 24 24" fill="none" stroke="#15100A" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12.5 9.5 18 20 6"/></svg>',
+  checkw:'<svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12.5 9.5 18 20 6"/></svg>',
+  chev:'<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="m9 6 6 6-6 6"/></svg>',
+  x:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M6 6 18 18M18 6 6 18"/></svg>',
+  plus:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg>',
+  dumbbell:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M6.5 6.5 17.5 17.5"/><path d="m3 7 4-4 3 3-4 4Z"/><path d="m14 18 4-4 3 3-4 4Z"/><path d="m2 14 4 4"/><path d="m16 4 4 4"/></svg>',
+  food:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M4 3v8a2 2 0 0 0 4 0V3"/><path d="M6 11v10"/><path d="M16 3c-1.5 0-3 1.5-3 4s1 4 3 4v10"/></svg>',
+  shield:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3 20 6v6c0 5-3.5 8-8 9-4.5-1-8-4-8-9V6Z"/></svg>',
+  pulse:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12h4l2 6 4-13 2 7h6"/></svg>',
+  note:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M5 3h11l4 4v14H5Z"/><path d="M15 3v5h5"/><path d="M9 13h6M9 17h4"/></svg>',
+  target:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="5"/><circle cx="12" cy="12" r="1"/></svg>',
+  brain:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M9 4a3 3 0 0 0-3 3 3 3 0 0 0-1 5 3 3 0 0 0 1 5 3 3 0 0 0 3 3 2.5 2.5 0 0 0 2.5-2.5V6.5A2.5 2.5 0 0 0 9 4Z"/><path d="M15 4a3 3 0 0 1 3 3 3 3 0 0 1 1 5 3 3 0 0 1-1 5 3 3 0 0 1-3 3 2.5 2.5 0 0 1-2.5-2.5V6.5A2.5 2.5 0 0 1 15 4Z"/></svg>',
+  moon:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M20 14.5A8 8 0 0 1 9.5 4 8 8 0 1 0 20 14.5Z"/></svg>',
+  briefcase:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="7" width="18" height="13" rx="2"/><path d="M8 7V5a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>',
+  cap:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="m2 9 10-4 10 4-10 4Z"/><path d="M6 11v5c0 1 2.7 2.5 6 2.5s6-1.5 6-2.5v-5"/></svg>',
+  drop:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3s6 6 6 11a6 6 0 0 1-12 0c0-5 6-11 6-11Z"/></svg>',
+  spark:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v4M12 17v4M3 12h4M17 12h4M6 6l2.5 2.5M15.5 15.5 18 18M18 6l-2.5 2.5M8.5 15.5 6 18"/></svg>',
+  arrow:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg>',
+  copy:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="12" height="12" rx="2"/><path d="M5 15V5a2 2 0 0 1 2-2h10"/></svg>',
+  lock:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="10" width="16" height="11" rx="2"/><path d="M8 10V7a4 4 0 0 1 8 0v3"/></svg>',
+  globe:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3c2.5 2.5 2.5 15 0 18M12 3c-2.5 2.5-2.5 15 0 18"/></svg>',
+  flame:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3c1 3 4 4.5 4 8a4 4 0 0 1-8 0c0-1.5.7-2.5 1.5-3.5C9 9.5 11 7 12 3Z"/></svg>',
+  dots:'<svg viewBox="0 0 24 24" fill="currentColor"><circle cx="12" cy="5" r="1.7"/><circle cx="12" cy="12" r="1.7"/><circle cx="12" cy="19" r="1.7"/></svg>',
+  cog:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3M5 5l2 2M17 17l2 2M19 5l-2 2M7 17l-2 2"/></svg>',
+};
+
+/* domain icon map */
+const DOM_IC = {Sport:'dumbbell',Santé:'pulse',Nutrition:'food',Études:'cap',Business:'briefcase',Travail:'briefcase',Digital:'globe',Lifestyle:'moon',Mental:'brain',Addictions:'shield'};
+
+/* ============================================================
+   SEED DATA — multi-profil : étudiant · sportif · entrepreneur
+   ============================================================ */
+const DB = {
+  cycle:{ id:'c-now', name:'Reprise & Lancement', type:'Standard', total:90, day:1 },
+  cycleHistory:[],
+  /* alignement quotidien des 30 derniers jours (pour stats + heatmap) */
+  alignHistory:[],
+  bestStreak:0,
+  /* taux de réussite par habitude sur le cycle — alimente points forts / faibles */
+  habitStats:[],
+  profile:{ pseudo:'@nathan.k', bio:"Premier cycle Elyos. Je construis mon système.", public:true,
+    show:{domaines:true,cycles:true,systemes:true,progression:true,alignement:true} },
+  domains:['Sport','Business','Lifestyle','Addictions','Nutrition','Études'],
+  objectives:[],
+  priorities:[],
+  /* actions du jour — la lecture vit DANS la routine matin (jamais re-comptée) */
+  actions:[],
+  routines:[],
+  sport:{
+    library:[
+      {id:'dc',nm:'Développé couché',grp:'Pectoraux'},
+      {id:'dih',nm:'Développé incliné haltères',grp:'Pectoraux'},
+      {id:'ecarte',nm:'Écarté à la poulie',grp:'Pectoraux'},
+      {id:'dip',nm:'Dips lestés',grp:'Triceps'},
+      {id:'tripoulie',nm:'Extension triceps poulie',grp:'Triceps'},
+      {id:'dm',nm:'Développé militaire',grp:'Épaules'},
+      {id:'latrel',nm:'Élévations latérales',grp:'Épaules'},
+      {id:'tractions',nm:'Tractions lestées',grp:'Dos'},
+      {id:'rowbarre',nm:'Rowing barre',grp:'Dos'},
+      {id:'tirage',nm:'Tirage vertical',grp:'Dos'},
+      {id:'curlbarre',nm:'Curl barre',grp:'Biceps'},
+      {id:'curlinc',nm:'Curl incliné haltères',grp:'Biceps'},
+      {id:'squat',nm:'Squat',grp:'Jambes'},
+      {id:'presse',nm:'Presse à cuisses',grp:'Jambes'},
+      {id:'sdtr',nm:'Soulevé de terre roumain',grp:'Ischios'},
+      {id:'mollets',nm:'Mollets debout',grp:'Mollets'},
+      {id:'gainage',nm:'Gainage',grp:'Abdos'}
+    ],
+    prev:{},
+    templates:[
+      {id:'push',nm:'Push',sub:'Pectoraux · Épaules · Triceps',exIds:['dc','dih','dip','latrel','tripoulie']},
+      {id:'pull',nm:'Pull',sub:'Dos · Biceps',exIds:['tractions','rowbarre','tirage','curlbarre','curlinc']},
+      {id:'legs',nm:'Legs',sub:'Jambes · Ischios · Mollets',exIds:['squat','presse','sdtr','mollets']}
+    ],
+    history:[],
+    active:null
+  },
+  nutrition:{ goalKcal:3000, goalP:180, goalC:330, goalF:90, weight:72,
+    meals:[
+      {n:'Petit-déjeuner',items:[]},
+      {n:'Déjeuner',items:[]},
+      {n:'Snack',items:[]},
+      {n:'Dîner',items:[]},
+    ]},
+  addiction:{id:'ad1',name:'Nicotine',start:'Aujourd\u2019hui',clean:0,best:0,relapses:0,
+    saved:0,timeGained:'0 h',
+    triggers:['Stress','Soirées','Pause café'],
+    log:[] },
+  lifestyle:[
+    {k:'Sommeil',v:'—',ic:'moon',pct:0},
+    {k:'Énergie',v:'—',ic:'spark',pct:0},
+    {k:'Humeur',v:'—',ic:'pulse',pct:0},
+    {k:'Stress',v:'—',ic:'brain',pct:0},
+    {k:'Écran',v:'—',ic:'globe',pct:0},
+    {k:'Eau',v:'—',ic:'drop',pct:0},
+  ],
+  systems:[
+    {id:'s1',name:'Reprise en main',off:true,desc:'Repartir de zéro proprement : sommeil, sport léger, focus.',
+      tags:['Lifestyle','Sport','Mental'],obj:2,act:3,rout:1,users:'12.4k',cyc:'90 j',
+      tpl:{objs:[{n:'Routine de sommeil stable',dom:'Lifestyle',type:'manuel'},{n:'Reprendre le sport',dom:'Sport',type:'quantitatif',target:12,unit:'séances'}],
+        habits:[{t:'Marche 30 min',dom:'Sport',freq:'daily',obj:1},{t:'Coucher avant 23h30',dom:'Lifestyle',freq:'daily',obj:0},{t:'Méditation 10 min',dom:'Lifestyle',freq:'daily',obj:0}],
+        routine:{name:'Routine matin',sub:'Discipline',steps:['Réveil 7h','Grand verre d\u2019eau','3 priorités du jour']}}},
+    {id:'s2',name:'Prise de masse',off:true,desc:'Surplus calorique maîtrisé, split Push/Pull/Legs, suivi du poids.',
+      tags:['Sport','Nutrition'],obj:2,act:3,rout:0,users:'8.9k',cyc:'90 j',
+      tpl:{objs:[{n:'Prendre 5 kg',dom:'Sport',type:'mesurable',target:77,unit:'kg',start:72},{n:'Atteindre 180g de protéines/j',dom:'Nutrition',type:'manuel'}],
+        habits:[{t:'Salle 4×/semaine',dom:'Sport',freq:'5x',obj:0},{t:'Suivi des calories',dom:'Nutrition',freq:'daily',obj:1},{t:'Dormir 8 h',dom:'Lifestyle',freq:'daily',obj:0}]}},
+    {id:'s3',name:'Dopamine Reset',off:true,desc:'Réduire la sur-stimulation, retrouver de la concentration.',
+      tags:['Digital','Mental','Addictions'],obj:2,act:3,rout:0,users:'21.7k',cyc:'30 j',
+      tpl:{objs:[{n:'30 jours sans porn',dom:'Addictions',type:'streak',target:30,unit:'jours'},{n:'Réduire le temps d\u2019écran',dom:'Lifestyle',type:'manuel'}],
+        habits:[{t:'0 réseaux le matin',dom:'Lifestyle',freq:'daily',obj:1},{t:'Aucune rechute aujourd\u2019hui',dom:'Addictions',freq:'daily',obj:0},{t:'Lecture 20 min',dom:'Personnel',freq:'daily',obj:1}]}},
+    {id:'s4',name:'Stop nicotine',off:true,desc:'Arrêt progressif, suivi des déclencheurs, gains visibles.',
+      tags:['Addictions','Mental'],obj:1,act:3,rout:0,users:'6.1k',cyc:'30 j',
+      tpl:{objs:[{n:'30 jours sans nicotine',dom:'Addictions',type:'streak',target:30,unit:'jours'}],
+        habits:[{t:'Aucune rechute aujourd\u2019hui',dom:'Addictions',freq:'daily',obj:0},{t:'Respiration 5 min',dom:'Lifestyle',freq:'daily',obj:0},{t:'Marche après repas',dom:'Sport',freq:'daily',obj:0}]}},
+    {id:'s5',name:'Entrepreneur Starter',off:true,desc:'Sortir un produit : exécution quotidienne sur un seul projet.',
+      tags:['Business','Digital'],obj:2,act:3,rout:0,users:'4.3k',cyc:'90 j',
+      tpl:{objs:[{n:'Lancer mon produit',dom:'Business',type:'etapes',steps:['Cadrer l\u2019offre','MVP','10 utilisateurs','Premier paiement']},{n:'Productivité',dom:'Business',type:'manuel'}],
+        habits:[{t:'Deep Work 2 h',dom:'Business',freq:'daily',obj:1},{t:'Parler à 1 utilisateur',dom:'Business',freq:'3x',obj:0},{t:'Planifier la journée',dom:'Business',freq:'daily',obj:1}]}},
+    {id:'s6',name:'Étudiant discipliné',off:true,desc:'Rythme de révisions, focus profond, sommeil régulier.',
+      tags:['Études','Lifestyle'],obj:2,act:3,rout:0,users:'9.7k',cyc:'90 j',
+      tpl:{objs:[{n:'Réussir mes examens',dom:'Études',type:'manuel'},{n:'Lire 6 livres',dom:'Personnel',type:'quantitatif',target:6,unit:'livres'}],
+        habits:[{t:'Révisions espacées',dom:'Études',freq:'daily',obj:0},{t:'Deep Work 90 min',dom:'Études',freq:'5x',obj:0},{t:'Sommeil régulier',dom:'Lifestyle',freq:'daily',obj:0}]}},
+    {id:'s7',name:'Routine sommeil',off:true,desc:'Stabiliser ton coucher et améliorer ta récupération.',
+      tags:['Lifestyle','Santé'],obj:1,act:2,rout:1,users:'15.2k',cyc:'30 j',
+      tpl:{objs:[{n:'Sommeil stable 8 h',dom:'Lifestyle',type:'manuel'}],
+        habits:[{t:'Coucher avant 23h30',dom:'Lifestyle',freq:'daily',obj:0},{t:'Pas d\u2019écran au lit',dom:'Lifestyle',freq:'daily',obj:0}],
+        routine:{name:'Routine soir',sub:'Sommeil',steps:['Pas d\u2019écran après 22h30','Étirements 5 min','Lecture papier','Extinction 23h30']}}},
+    {id:'s8',name:'Discipline 30 J',off:true,desc:'30 jours de constance sur 5 actions non négociables.',
+      tags:['Mental','Lifestyle'],obj:1,act:5,rout:0,users:'18.0k',cyc:'30 j',
+      tpl:{objs:[{n:'Discipline — 30 jours',dom:'Lifestyle',type:'streak',target:30,unit:'jours'}],
+        habits:[{t:'Réveil 6h30',dom:'Lifestyle',freq:'daily',obj:0},{t:'Sport',dom:'Sport',freq:'daily',obj:0},{t:'Lecture 20 min',dom:'Personnel',freq:'daily',obj:0},{t:'Eau 2 L',dom:'Santé',freq:'daily',obj:0},{t:'Méditation',dom:'Lifestyle',freq:'daily',obj:0}]}},
+  ],
+  publicSystems:[
+    {id:'p1',name:'Sèche propre — 12 sem.',off:false,author:'@lucie.fit',desc:'Déficit léger, cardio raisonné, 0 frustration.',
+      tags:['Nutrition','Sport'],obj:2,act:3,rout:0,users:'2.1k',cyc:'90 j',copyable:true,
+      tpl:{objs:[{n:'Perdre 4 kg',dom:'Sport',type:'mesurable',target:68,unit:'kg',start:72},{n:'Cardio régulier',dom:'Sport',type:'quantitatif',target:24,unit:'séances'}],
+        habits:[{t:'Déficit léger maîtrisé',dom:'Nutrition',freq:'daily',obj:0},{t:'10 000 pas',dom:'Sport',freq:'daily',obj:1},{t:'Musculation 3×/sem',dom:'Sport',freq:'3x',obj:0}]}},
+    {id:'p2',name:'Créateur de contenu',off:false,author:'@maxbuilds',desc:'Publier tous les jours sans s\u2019épuiser. Rythme + idées.',
+      tags:['Digital','Business','Mental'],obj:2,act:3,rout:0,users:'3.8k',cyc:'90 j',copyable:true,
+      tpl:{objs:[{n:'Publier 90 jours d\u2019affilée',dom:'Business',type:'streak',target:90,unit:'jours'},{n:'1000 abonnés',dom:'Business',type:'quantitatif',target:1000,unit:'abonnés'}],
+        habits:[{t:'1 post / jour',dom:'Business',freq:'daily',obj:0},{t:'Batch d\u2019idées',dom:'Business',freq:'3x',obj:0},{t:'Engager 15 min',dom:'Business',freq:'daily',obj:1}]}},
+    {id:'p3',name:'Deep Work Étudiant',off:false,author:'@sofia.med',desc:'Blocs de focus, anti-distraction, révisions espacées.',
+      tags:['Études','Digital'],obj:1,act:3,rout:0,users:'1.4k',cyc:'90 j',copyable:false,
+      tpl:{objs:[{n:'Réussir le semestre',dom:'Études',type:'manuel'}],
+        habits:[{t:'2 blocs Deep Work',dom:'Études',freq:'daily',obj:0},{t:'Téléphone en autre pièce',dom:'Lifestyle',freq:'daily',obj:0},{t:'Révisions espacées',dom:'Études',freq:'daily',obj:0}]}},
+  ],
+  academy:{
+    Corps:[
+      {t:'Hypertrophie : le volume qui compte vraiment',read:'6 min',cta:'Utiliser le système Prise de masse',ctaSys:'s2'},
+      {t:'Récupération & sommeil profond',read:'5 min',cta:'Ajouter une routine sommeil',ctaRout:'r2'},
+    ],
+    Nutrition:[
+      {t:'Protéines : combien, quand, pourquoi',read:'4 min',cta:'Définir mon objectif calorique',ctaTrack:'nutrition'},
+      {t:'Surplus propre vs dirty bulk',read:'7 min',cta:'Utiliser le système Prise de masse',ctaSys:'s2'},
+    ],
+    Cerveau:[
+      {t:'Dopamine : reprendre le contrôle',read:'8 min',cta:'Lancer un Dopamine Reset',ctaSys:'s3'},
+      {t:'Vaincre la procrastination par l\u2019exécution',read:'5 min',cta:'Créer une action « 1h focus »',ctaTrack:'system'},
+    ],
+    Mindset:[
+      {t:'La discipline bat la motivation',read:'4 min',cta:'Lancer Discipline 30 J',ctaSys:'s8'},
+      {t:'Échouer sans abandonner',read:'6 min',cta:null},
+    ],
+    Digital:[
+      {t:'Personal branding sans se vendre',read:'7 min',cta:'Utiliser Créateur de contenu',ctaSys:'p2'},
+      {t:'Storytelling pour créateurs',read:'5 min',cta:null},
+    ],
+  },
+};
+
+/* ============================================================
+   RUNTIME STATE
+   ============================================================ */
+const state = {
+  onboarded:false,
+  screen:'dashboard',
+  ob:{ step:0, cycle:null, domains:[], system:null, mode:null, text:'', aiBlocks:null },
+  sub:null,        // sub-screen { kind, id }
+  toastTimer:null,
+};
+let seq=100;                 // unique id generator for created objectives/actions
+let tmpAct=null;             // { id?, objIds[], title, freq }  -> action create/edit
+let pendingDel=null;         // id d'habitude en attente de confirmation de suppression
+let tmpObj=null;             // { dom, name, type, target, unit, date } -> objective create
+let asst={proposal:null,last:''};   // assistant scripted state
+const DOMAINS=['Sport','Santé','Nutrition','Études','Business','Travail','Personnel','Lifestyle','Addictions'];
+const LIFE_LIB=[{k:'Sommeil',ic:'moon'},{k:'Énergie',ic:'spark'},{k:'Humeur',ic:'pulse'},{k:'Stress',ic:'brain'},{k:'Écran',ic:'globe'},{k:'Eau',ic:'drop'},{k:'Lecture',ic:'book'},{k:'Méditation',ic:'brain'},{k:'Pas',ic:'flame'}];
+
+/* ============================================================
+   HELPERS
+   ============================================================ */
+const $ = s => document.querySelector(s);
+const app = () => $('#app');
+const esc = s => String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const clamp = (n,a,b)=>Math.max(a,Math.min(b,n));
+
+function toast(msg){
+  const t=$('#toast');
+  t.innerHTML=I.spark+'<span>'+esc(msg)+'</span>';
+  t.classList.add('on');
+  clearTimeout(state.toastTimer);
+  state.toastTimer=setTimeout(()=>t.classList.remove('on'),2200);
+}
+
+/* alignment = part des actions du jour réalisées (pondérée) */
+function dayAlignment(){
+  let done=0,tot=0;
+  DB.actions.filter(a=>a.today!==false).forEach(a=>{
+    const w = (a.type==='routine'||a.type==='workout')?2:1;
+    const isNew = a.createdDay===DB.cycle.day;   // ajoutée aujourd'hui : ne peut que faire gagner
+    if(actionDone(a)){ done+=w; tot+=w; }
+    else if(!isNew){ tot+=w; }
+  });
+  return tot? Math.round(done/tot*100):0;
+}
+/* Le domaine d'une habitude dérive de son objectif — jamais demandé à l'utilisateur */
+function actDomain(a){
+  const ids=actObjIds(a);
+  for(const id of ids){ const o=DB.objectives.find(x=>x.id===id); if(o) return o.dom; }
+  return a.dom||'';
+}
+function nutritionTotalToday(){ return DB.nutrition.meals.reduce((a,m)=>{m.items.forEach(i=>{a.k+=i.k;a.p+=i.p;});return a;},{k:0,p:0}); }
+function actionDone(a){
+  if(a.type==='routine'){ const r=DB.routines.find(r=>r.id===a.ref); return r && r.steps.every(s=>s.done); }
+  if(a.type==='nutrition'){ return nutritionTotalToday().k>0; }
+  return a.done;
+}
+function routineProgress(r){ const d=r.steps.filter(s=>s.done).length; return {done:d,tot:r.steps.length,pct:Math.round(d/r.steps.length*100)}; }
+function frNum(n){ return (Math.round(n*10)/10).toString().replace('.',','); }
+function objProg(o){
+  if(o.type==='etapes'){ return o.steps.length?Math.round(o.steps.filter(s=>s.done).length/o.steps.length*100):0; }
+  if(o.type==='manuel'){ return clamp(Math.round(o.current||0),0,100); }
+  const span=(o.target-(o.start||0))||1;
+  return clamp(Math.round((o.current-(o.start||0))/span*100),0,100);
+}
+function objResult(o){
+  if(o.type==='etapes'){ const d=o.steps.filter(s=>s.done).length; return d+' / '+o.steps.length+' étapes'; }
+  if(o.type==='mesurable'){ return frNum(o.current)+' / '+o.target+(o.unit?' '+o.unit:''); }
+  if(o.type==='streak'){ return o.current+' j / '+o.target+' j'; }
+  if(o.type==='manuel'){ return (o.current||0)+'% · estimé'; }
+  return frNum(o.current)+' / '+o.target+(o.unit?' '+o.unit:''); // quantitatif & tracker
+}
+/* Résultat "trajet" : départ → actuel → cible (langage visuel repris de la maquette Design) */
+function objJourney(o){
+  const cur=v=>'<b class="jv">'+v+'</b>';
+  if(o.type==='etapes'){ const d=o.steps.filter(s=>s.done).length; return 'Étape '+cur(d)+' / '+o.steps.length; }
+  if(o.type==='manuel'){ return cur((o.current||0)+'%')+' estimé'; }
+  if(o.type==='streak'){ return cur(o.current)+' / '+o.target+' j'; }
+  if(o.type==='mesurable'){
+    return frNum(o.start||0)+' <span class="arw">→</span> '+cur(frNum(o.current))+' <span class="arw">→</span> '+o.target+(o.unit?' '+esc(o.unit):'');
+  }
+  return cur(frNum(o.current))+' / '+o.target+(o.unit?' '+esc(o.unit):''); // quantitatif
+}
+function objAlignDetail(o){
+  const acts=objActions(o).filter(a=>a.today!==false);
+  if(!acts.length) return null;
+  let done=0,tot=0,doneCount=0;
+  acts.forEach(a=>{ const w=(a.type==='routine'||a.type==='workout')?2:1; tot+=w; if(actionDone(a)){done+=w;doneCount++;} });
+  return {done:doneCount,tot:acts.length,pct:Math.round(done/tot*100)};
+}
+function objAlign(o){ const d=objAlignDetail(o); return d?d.pct:0; }
+function objActions(o){ return DB.actions.filter(a=>(a.objIds||[]).includes(o.id)); }
+function actObjIds(a){ return a.objIds||(a.objId?[a.objId]:[]); }
+function recomputeProg(o){ o.progress=objProg(o); }
+/* --- Domaines : hiérarchie de priorité (l'ordre = la priorité) --- */
+function domRank(dom){ const i=DB.domains.indexOf(dom); return i<0?DB.domains.length:i; }
+function domWeight(dom){ const i=DB.domains.indexOf(dom); if(i<0) return 1; return 1 + (DB.domains.length-1-i)*0.12; } // domaine prioritaire = plus de poids
+/* --- Stats d'alignement --- */
+function avg(a){ return a.length?Math.round(a.reduce((s,x)=>s+x,0)/a.length):0; }
+/* --- Streak d'alignement : jours consécutifs au-dessus du seuil --- */
+const ALIGN_OK=70;   // seuil "journée alignée"
+function alignStreak(){
+  const today=dayAlignment();
+  const todayCounts = today>=ALIGN_OK;
+  let n = todayCounts?1:0;
+  for(let i=DB.alignHistory.length-1;i>=0;i--){
+    if(DB.alignHistory[i]>=ALIGN_OK) n++; else break;
+  }
+  return {n, todayCounts, today};
+}
+function bestStreak(){
+  let best=0,cur=0;
+  const all=[...DB.alignHistory, dayAlignment()];
+  all.forEach(v=>{ if(v>=ALIGN_OK){cur++; if(cur>best)best=cur;} else cur=0; });
+  return Math.max(best, DB.bestStreak||0);
+}
+/* --- Clôture de journée : archive le score, met à jour les stats, remet à zéro le quotidien --- */
+function advanceDay(){
+  const score=dayAlignment();
+  DB.alignHistory.push(score);
+  DB.bestStreak=bestStreak();
+  // stats par habitude (taux de réussite cumulé sur le cycle)
+  DB.actions.filter(a=>a.today!==false).forEach(a=>{
+    let st=DB.habitStats.find(h=>h.k===a.title);
+    if(!st){ st={k:a.title,dom:a.dom,done:0,tot:0,pct:0}; DB.habitStats.push(st); }
+    st.tot++; if(actionDone(a)) st.done++;
+    st.pct=Math.round(st.done/st.tot*100);
+  });
+  // remise à zéro du jour
+  DB.actions.forEach(a=>{ a.done=false; });
+  DB.routines.forEach(r=>r.steps.forEach(s=>s.done=false));
+  DB.nutrition.meals.forEach(m=>m.items.length=0);
+  if(DB.cycle.day<DB.cycle.total) DB.cycle.day++;
+  return score;
+}
+function weekScores(){ return DB.alignHistory.slice(-7); }
+function monthScores(){ return DB.alignHistory.slice(-30); }
+function domActionsToday(dom){ return DB.actions.filter(a=>a.dom===dom && a.today!==false); }
+function domAlignDetail(dom){
+  const acts=domActionsToday(dom); if(!acts.length) return null;
+  let done=0,tot=0,doneCount=0;
+  acts.forEach(a=>{ const w=(a.type==='routine'||a.type==='workout')?2:1; tot+=w; if(actionDone(a)){done+=w;doneCount++;} });
+  return {done:doneCount,tot:acts.length,pct:Math.round(done/tot*100)};
+}
+function domAlign(dom){ const d=domAlignDetail(dom); return d?d.pct:0; }
+function cycleAlignmentDetail(){
+  let n=0,d=0,doneActs=0,totActs=0,domsCounted=0;
+  DB.domains.forEach(dom=>{ const det=domAlignDetail(dom); if(!det) return; const w=domWeight(dom);
+    n+=det.pct*w; d+=w; doneActs+=det.done; totActs+=det.tot; domsCounted++; });
+  return d? {pct:Math.round(n/d),doneActs,totActs,domsCounted} : null;
+}
+function cycleAlignment(){ const c=cycleAlignmentDetail(); return c?c.pct:null; }
+/* --- Instanciation réelle (assistant, systèmes, onboarding — même moteur partout) --- */
+function instantiateObjective(od){
+  const oid='o'+(++seq); if(!DB.domains.includes(od.dom)) DB.domains.push(od.dom);
+  const o={id:oid,dom:od.dom,name:od.n||od.objName,type:od.type,align:0,targetDate:'Fin de cycle'};
+  if(od.type==='etapes'){ o.steps=(od.steps||[]).map(t=>({t,done:false})); }
+  else if(od.type==='manuel'){ o.start=0;o.current=0;o.target=100;o.unit='%'; }
+  else { o.start=od.start||0; o.current=(od.current!=null?od.current:od.start)||0; o.target=od.target||10; o.unit=od.unit||''; }
+  recomputeProg(o); DB.objectives.push(o); DB.priorities.push(oid); return oid;
+}
+/* --- Détection d'action-tracker : relie une habitude au vrai tracker (Sport/Nutrition/Addictions) --- */
+const ACTION_TRACKER_GUESS=[
+  {type:'workout',ref:'w1',dom:'Sport',re:/séance|musculation|salle|sport|entraînement|workout|muscu/i},
+  {type:'nutrition',ref:'n1',dom:'Nutrition',re:/calorie|nutrition|repas|macro|protéine|kcal|suivi.*aliment/i},
+  {type:'addiction',ref:'ad1',dom:'Addictions',re:/nicotine|clope|tabac|alcool|sucre|porn|rechute|sans\s|sevr/i}
+];
+function guessActionTracker(title,dom){
+  for(const g of ACTION_TRACKER_GUESS){
+    if(g.dom===dom && g.re.test(title||'') && !DB.actions.some(a=>a.type===g.type)) return g;
+  }
+  return null;
+}
+function makeAction(title,dom,objIds,freq,forceTracker){
+  let g = forceTracker ? ACTION_TRACKER_GUESS.find(x=>x.dom===dom && !DB.actions.some(a=>a.type===x.type)) : null;
+  if(!g) g=guessActionTracker(title,dom);
+  const a={id:'a'+(++seq),type:g?g.type:'simple',title,dom,objIds:objIds||[],freq:freq||'daily',today:true,done:false};
+  if(g) a.ref=g.ref;
+  return a;
+}
+function instantiateBlocks(blocks){
+  let firstId=null;
+  (blocks||[]).forEach(b=>{ const oid=instantiateObjective({dom:b.dom,objName:b.objName,type:b.type,target:b.target,unit:b.unit,start:b.start,current:b.current}); firstId=firstId||oid;
+    const forceEligible = b.type==='streak' && b.dom==='Addictions';
+    (b.habits||[]).forEach((h,i)=>DB.actions.push(makeAction(h,b.dom,[oid],'daily',forceEligible && i===0))); });
+  return firstId;
+}
+function instantiateSystem(sys){
+  if(!sys||!sys.tpl) return null;
+  const map=[]; const objInfo=(sys.tpl.objs||[]).map(od=>({dom:od.dom,type:od.type}));
+  (sys.tpl.objs||[]).forEach(od=>{ map.push(instantiateObjective(od)); });
+  const forcedFor=new Set();
+  (sys.tpl.habits||[]).forEach(h=>{ const dom=h.dom||'Personnel'; const oid=(h.obj!=null&&map[h.obj])?map[h.obj]:null;
+    const info=h.obj!=null?objInfo[h.obj]:null;
+    const forceEligible = info && info.type==='streak' && info.dom==='Addictions';
+    const force = oid!=null && forceEligible && !forcedFor.has(h.obj); if(force) forcedFor.add(h.obj);
+    DB.actions.push(makeAction(h.t,dom,oid?[oid]:[],h.freq||'daily',force)); });
+  if(sys.tpl.routine){ const rid='r'+(++seq); DB.routines.push({id:rid,name:sys.tpl.routine.name,sub:sys.tpl.routine.sub||'',timed:false,days:'Tous les jours',steps:sys.tpl.routine.steps.map(t=>({t,tm:'',done:false}))}); DB.actions.push({id:'a'+(++seq),type:'routine',ref:rid,title:sys.tpl.routine.name,dom:'Lifestyle',objIds:[],freq:'daily',today:true,done:false}); }
+  return map[0]||null;
+}
+function heatColor(p){ if(p>=85)return 'var(--or)'; if(p>=70)return 'var(--or-dim)'; if(p>=50)return 'rgba(201,162,77,.42)'; if(p>0)return 'rgba(201,162,77,.20)'; return 'var(--titane)'; }
+const FREQ={daily:'Tous les jours','3x':'3×/semaine','5x':'5×/semaine',custom:'Personnalisé'};
+function freqLabel(f){ return FREQ[f]||'Tous les jours'; }
+const TYPE_LABEL={mesurable:'Mesurable',quantitatif:'Quantitatif',etapes:'Par étapes',streak:'Streak',tracker:'Basé sur tracker',manuel:'Manuel'};
+function typeExplain(t){return {mesurable:'la progression vient d\u2019une valeur mesurée.',quantitatif:'la progression = quantité atteinte sur la cible.',etapes:'la progression = étapes franchies.',streak:'la progression = jours consécutifs tenus.',tracker:'la progression suit un tracker (km, pages…).',manuel:'tu estimes toi-même l\u2019avancement.'}[t]||'';}
+/* ============================================================
+   ALIGNMENT DIAL (signature) — bezel à graduations, arc or
+   ============================================================ */
+function dialSVG(pct, dayPct){
+  const R=104, Rd=94, C=2*Math.PI*R, Cd=2*Math.PI*Rd;
+  const off=C*(1-pct/100), offD=Cd*(1-dayPct/100);
+  // graduation ticks (60), every 5th major — esprit bezel/ingénierie, sans chiffres
+  let ticks='';
+  for(let i=0;i<60;i++){
+    const ang=(i/60)*2*Math.PI, maj=i%5===0;
+    const r1=maj?118:121, r2=126;
+    const x1=128+r1*Math.cos(ang), y1=128+r1*Math.sin(ang);
+    const x2=128+r2*Math.cos(ang), y2=128+r2*Math.sin(ang);
+    ticks+='<line class="tickmark'+(maj?' maj':'')+'" x1="'+x1.toFixed(1)+'" y1="'+y1.toFixed(1)+'" x2="'+x2.toFixed(1)+'" y2="'+y2.toFixed(1)+'" stroke-width="'+(maj?1.4:0.8)+'"/>';
+  }
+  return '<svg viewBox="0 0 256 256">'
+    + ticks
+    + '<circle class="arc-day" cx="128" cy="128" r="'+Rd+'" fill="none" stroke-width="2" stroke-dasharray="'+Cd+'" stroke-dashoffset="'+offD+'" stroke-linecap="round"/>'
+    + '<circle class="arc-track" cx="128" cy="128" r="'+R+'" fill="none" stroke-width="7"/>'
+    + '<circle class="arc-fill" cx="128" cy="128" r="'+R+'" fill="none" stroke-width="7" stroke-dasharray="'+C+'" stroke-dashoffset="'+off+'" stroke-linecap="round"/>'
+    + '</svg>';
+}
+
+/* ============================================================
+   CHROME : topbar + bottom nav
+   ============================================================ */
+function topbar(eyebrow,title,opts={}){
+  return '<div class="topbar">'
+    + '<div>'
+    +   (opts.wordmark
+        ? '<div class="wordmark"><div class="glyph"></div><div class="name">ELYOS</div></div>'
+        : '<div class="eyebrow">'+esc(eyebrow)+'</div><div class="h1">'+esc(title)+'</div>')
+    + '</div>'
+    + '<button class="avatar" data-act="go" data-screen="profile">NK</button>'
+    + '</div>';
+}
+
+const NAV=[
+  {k:'dashboard',ic:'home',l:'Aujourd\u2019hui'},
+  {k:'progression',ic:'chart',l:'Progression'},
+  {k:'systeme',ic:'layers',l:'Système'},
+  {k:'bibliotheque',ic:'grid',l:'Systèmes'},
+  {k:'profile',ic:'cog',l:'Profil'},
+];
+function nav(){
+  return '<div class="nav">'+NAV.map(n=>
+    '<button class="'+(state.screen===n.k?'on':'')+'" data-act="go" data-screen="'+n.k+'">'
+    + I[n.ic] + '<span>'+n.l+'</span></button>').join('')+'</div>';
+}
+
+/* ============================================================
+   SCREEN : DASHBOARD (vue d'exécution du jour)
+   ============================================================ */
+function screenDashboard(){
+  const al=dayAlignment();
+  const dayPct=Math.round(DB.cycle.day/DB.cycle.total*100);
+  const prios=(DB.priorities.length?DB.priorities.map(id=>DB.objectives.find(o=>o.id===id)):DB.objectives.slice(0,3)).filter(Boolean);
+  const hasObj=DB.objectives.length>0;
+  const todayActs=DB.actions.filter(a=>a.today!==false);
+  const doneToday=todayActs.filter(a=>actionDone(a)).length;
+  const freshDay = DB.cycle.day===1 && doneToday===0;
+  const ringLabel = freshDay
+    ? (todayActs.length ? 'Ta journée commence' : 'Construis ta journée')
+    : 'Alignement du jour';
+  const ringFigure = freshDay ? '—' : (al+'<sup>%</sup>');
+
+  const dial='<div class="card tick"><div class="dial-wrap"><div class="dial">'
+    + dialSVG(al,dayPct)
+    + '<div class="face"><div class="pct">'+ringFigure+'</div>'
+    + '<div class="lbl">'+ringLabel+'</div>'
+    + '<div class="day">Cycle '+DB.cycle.type+' · Jour '+DB.cycle.day+' / '+DB.cycle.total+'</div></div>'
+    + '</div></div>'
+    + (freshDay && todayActs.length ? '<div class="note" style="text-align:center;margin-top:12px">'+todayActs.length+' action'+(todayActs.length>1?'s':'')+' prévue'+(todayActs.length>1?'s':'')+' aujourd\u2019hui. Coche la première pour démarrer ton alignement.</div>'
+       : todayActs.length ? '<div class="dial-proof">'+doneToday+' / '+todayActs.length+' habitudes réalisées aujourd\u2019hui</div>' : '')
+    + (()=>{ const st=alignStreak();
+        if(st.n>=2) return '<div class="streak-badge"><span class="sb-ic">'+I.flame+'</span><span class="sb-n">'+st.n+'</span><span class="sb-l">jour'+(st.n>1?'s':'')+' aligné'+(st.n>1?'s':'')+' d\u2019affilée</span></div>';
+        if(st.todayCounts) return '<div class="streak-badge"><span class="sb-ic">'+I.flame+'</span><span class="sb-l">Journée alignée — reviens demain pour lancer ta série</span></div>';
+        return ''; })()
+    + '</div>';
+
+  const prioCard='<div class="card"><div style="display:flex;align-items:baseline;justify-content:space-between;margin-bottom:4px">'
+    + '<div class="eyebrow">Objectifs prioritaires</div>'
+    + '<span style="display:flex;gap:12px">'
+    + (DB.objectives.length>1 ? '<span data-act="sheet" data-id="objpriority" style="font:500 10px var(--mono);color:var(--argent);letter-spacing:.1em;text-transform:uppercase">Réordonner</span>' : '')
+    + '<span data-act="go" data-screen="progression" style="font:500 10px var(--mono);color:var(--or);letter-spacing:.1em;text-transform:uppercase">Voir tout</span></span></div>'
+    + prios.map(o=>
+      '<div class="obj" data-act="objective" data-id="'+o.id+'">'
+      + '<div class="top"><div><div class="dom">'+esc(o.dom)+'</div><div class="name">'+esc(o.name)+'</div></div>'
+      + '<div class="jrn">'+objJourney(o)+'</div></div>'
+      + '<div class="bar"><i style="width:'+o.progress+'%"></i></div></div>').join('')
+    + '</div>';
+
+  const actsList=todayActs.map(a=>{
+    const done=actionDone(a);
+    let meta='';
+    if(a.type==='routine'){ const r=DB.routines.find(r=>r.id===a.ref); const p=routineProgress(r); meta='<span class="mini">'+p.done+'/'+p.tot+'</span>'; }
+    const grouped = a.type==='routine';
+    const dom=actDomain(a);
+    const isNew = a.createdDay===DB.cycle.day;
+    return '<div class="swipe-wrap" data-swipe="'+a.id+'">'
+      + '<div class="swipe-actions">'
+      +   '<button class="sw-edit" data-act="actedit" data-id="'+a.id+'">'+I.cog+'<span>Modifier</span></button>'
+      +   '<button class="sw-del" data-act="actaskdel" data-id="'+a.id+'">'+I.x+'<span>Supprimer</span></button>'
+      + '</div>'
+      + '<div class="action swipe-face '+(done?'done':'')+(grouped?' grouped':'')+'" data-act="action" data-id="'+a.id+'">'
+      +   '<div class="check" data-act="toggle" data-id="'+a.id+'">'+I.check+'</div>'
+      +   '<div class="body"><div class="t">'+esc(a.title)+'</div>'
+      +   '<div class="meta">'+(dom?esc(dom):'Sans objectif')+(a.meta?' · '+esc(a.meta):'')+(isNew?' · <span class="newtag">nouveau</span>':'')+'</div></div>'
+      +   (meta||'')
+      +   '<button class="row-menu" data-act="actmenu" data-id="'+a.id+'">'+I.dots+'</button>'
+      + '</div></div>';
+  }).join('');
+
+  const asstBanner='<div class="asst-banner" data-act="openassistant">'
+    + '<div class="ab-ic">'+I.spark+'</div>'
+    + '<div class="ab-tx"><div class="ab-t">Assistant Elyos</div><div class="ab-s">Décris ton objectif, reçois ton système</div></div>'
+    + '<span class="chev">'+I.chev+'</span></div>';
+
+  const nutTot=nutritionTotalToday();
+  const trackerCards='<div class="tgrid">'
+    + '<div class="tcard" data-act="sub" data-id="sport"><div class="th"><span class="tdot" style="background:var(--or)"></span><span class="tn">Sport</span></div>'
+    +   '<div class="tv">'+(DB.sport.active?'En cours':(DB.sport.history.length?DB.sport.history.length+' séances':'—'))+'</div></div>'
+    + '<div class="tcard" data-act="sub" data-id="nutrition"><div class="th"><span class="tdot" style="background:var(--green)"></span><span class="tn">Nutrition</span></div>'
+    +   '<div class="tv">'+(nutTot.k?nutTot.k+' kcal':'—')+'</div></div>'
+    + '<div class="tcard" data-act="sub" data-id="addiction"><div class="th"><span class="tdot" style="background:var(--red)"></span><span class="tn">'+esc(DB.addiction.name)+'</span></div>'
+    +   '<div class="tv">'+DB.addiction.clean+' j sans</div></div>'
+    + '<div class="tcard" data-act="sub" data-id="lifestyle"><div class="th"><span class="tdot" style="background:var(--argent-2)"></span><span class="tn">Lifestyle</span></div>'
+    +   '<div class="tv">'+(DB.lifestyle.length?DB.lifestyle.length+' suivis':'—')+'</div></div>'
+    + '</div>';
+
+  const welcome = (!hasObj && !todayActs.length)
+    ? '<div class="card tick" style="text-align:center"><div class="eyebrow" style="text-align:center">Bienvenue dans ton cycle</div>'
+      + '<div class="note" style="margin:9px 0 15px">Ton système est encore vide. Construis-le de la façon qui te parle :</div>'
+      + '<button class="btn btn-primary" data-act="openassistant">'+I.spark+'Démarrer avec l\u2019assistant</button>'
+      + '<button class="btn btn-ghost" style="margin-top:9px" data-act="newobj">'+I.plus+'Créer un objectif</button>'
+      + '<button class="btn btn-ghost" style="margin-top:9px" data-act="go" data-screen="bibliotheque">'+I.layers+'Partir d\u2019un système'+'</button>'
+      + '</div>'
+    : '';
+
+  const todaySection = todayActs.length
+    ? '<div class="section-head"><div class="h2">Aujourd\u2019hui</div><div class="kicker"><span class="dot"></span>'+todayActs.filter(a=>actionDone(a)).length+'/'+todayActs.length+' faites</div></div>' + actsList
+      + '<button class="btn btn-ghost btn-sm" data-act="newhabit" style="margin-top:10px">'+I.plus+'Ajouter une habitude</button>'
+      + '<button class="btn btn-ghost btn-sm" data-act="sheet" data-id="endday" style="margin-top:10px">'+I.moon+'Clôturer ma journée</button>'
+    : (hasObj ? '<div class="section-head"><div class="h2">Aujourd\u2019hui</div></div><div class="card"><div class="note">Aucune habitude prévue aujourd\u2019hui.</div></div><button class="btn btn-ghost btn-sm" data-act="newhabit" style="margin-top:10px">'+I.plus+'Ajouter une habitude</button>' : '');
+
+  const objSection = hasObj
+    ? '<div class="section-head"><div class="h2">Objectifs</div></div>' + prioCard
+    : '';
+
+  return '<div class="view"><div class="scroll">'
+    + dial
+    + welcome
+    + todaySection
+    + objSection
+    + (hasObj ? asstBanner : '')
+    + '<div class="section-head"><div class="h2">Trackers</div></div>'
+    + trackerCards
+    + '</div></div>';
+}
+function qa(ic,label,act,id){
+  return '<button class="qa" data-act="'+act+'" data-id="'+id+'">'+(I[ic]||I.spark)+'<span>'+label+'</span></button>';
+}
+/* ============================================================
+   SCREEN : PROGRESSION (analyse — 1 à 2 fois / semaine)
+   ============================================================ */
+let progTab='cycle';
+function screenProgression(){
+  const al=dayAlignment();
+  const wk=weekScores(), mo=monthScores();
+  const hasHist=DB.alignHistory.length>0;
+  const cycDetail=cycleAlignmentDetail();
+  const todayActs=DB.actions.filter(a=>a.today!==false);
+  const doneToday=todayActs.filter(a=>actionDone(a)).length;
+  const map={jour:al, semaine:hasHist?avg(wk):null, mois:hasHist?avg(mo):null, cycle:cycDetail?cycDetail.pct:null};
+  const v=map[progTab];
+  const vDisplay = v===null ? '—' : (v+'<sup style="font-size:16px">%</sup>');
+
+  const seg='<div class="seg" style="margin-bottom:16px">'
+    +['jour','semaine','mois','cycle'].map(k=>'<button class="'+(progTab===k?'on':'')+'" data-act="progtab" data-id="'+k+'">'+k.charAt(0).toUpperCase()+k.slice(1)+'</button>').join('')
+    +'</div>';
+
+  let caption;
+  if(progTab==='jour') caption = todayActs.length ? doneToday+'/'+todayActs.length+' habitudes réalisées aujourd\u2019hui.' : 'Aucune habitude prévue aujourd\u2019hui.';
+  else if(progTab==='cycle') caption = cycDetail ? cycDetail.doneActs+'/'+cycDetail.totActs+' habitudes faites · pondéré par '+cycDetail.domsCounted+' domaine'+(cycDetail.domsCounted>1?'s':'')+' actif'+(cycDetail.domsCounted>1?'s':'')+', par priorité.' : 'Pas encore d\u2019habitudes prévues sur tes domaines.';
+  else caption = hasHist ? 'Moyenne de la période.' : 'Pas encore assez de jours de suivi.';
+
+  const ring='<div class="card tick" style="text-align:center;padding-top:22px">'
+    + '<div class="dial" style="width:170px;height:170px;margin:0 auto">'+dialSVG(v||0,100)
+    + '<div class="face"><div class="pct" style="font-size:40px">'+vDisplay+'</div>'
+    + '<div class="lbl">Alignement '+progTab+'</div></div></div>'
+    + '<div class="note" style="margin-top:14px">'+caption+'</div>'
+    + '</div>';
+
+  // graphe barres 7 jours (langage visuel Design) — visible dès le 1er jour
+  const days=['L','M','M','J','V','S','D'];
+  const todayIdx=Math.min(6,Math.max(0,(DB.cycle.day-1)%7));
+  const bars=[];
+  for(let i=0;i<7;i++){
+    const past = i<wk.length ? wk[i] : null;
+    const isToday = i===todayIdx;
+    const val = isToday ? al : (past!==null?past:null);
+    bars.push({d:days[i], v:val, today:isToday});
+  }
+  const weekStrip='<div class="card"><div class="eyebrow" style="margin-bottom:16px">7 derniers jours</div>'
+    +'<div class="barchart">'+bars.map(b=>{
+      const h = b.v===null?4:Math.max(4,b.v);
+      return '<div class="bcol"><div class="bfill'+(b.today?' now':'')+(b.v===null?' empty':'')+'" style="height:'+h+'%"></div><span class="bday'+(b.today?' now':'')+'">'+b.d+'</span></div>';
+    }).join('')+'</div>'
+    +(hasHist?'':'<div class="note" style="margin-top:12px">Ton historique se construit jour après jour.</div>')
+    +'</div>';
+  const heat=hasHist?'<div class="card"><div class="eyebrow" style="margin-bottom:6px">30 derniers jours</div>'
+    +'<div class="heat">'+mo.map(p=>'<div class="hc" style="background:'+heatColor(p)+'" title="'+p+'%"></div>').join('')+'</div>'
+    +'<div class="heatleg"><span>Moins</span><i style="background:rgba(201,162,77,.20)"></i><i style="background:rgba(201,162,77,.42)"></i><i style="background:var(--or-dim)"></i><i style="background:var(--or)"></i><span>Plus</span></div></div>'
+    :'';
+
+  const objs=DB.objectives.length? '<div class="card">'+DB.objectives.map(o=>
+    '<div class="obj" data-act="objective" data-id="'+o.id+'"><div class="top"><div>'
+    +'<div class="dom">'+esc(o.dom)+'</div><div class="name">'+esc(o.name)+'</div></div>'
+    +'<div class="jrn">'+objJourney(o)+'</div></div>'
+    +'<div class="bar"><i style="width:'+o.progress+'%"></i></div>'
+    +'<div class="objmini">Alignement '+objAlign(o)+'%</div></div>').join('')+'</div>'
+    : '<div class="card"><div class="note">Aucun objectif pour l\u2019instant. Crée-en un depuis le dashboard ou l\u2019assistant pour suivre ta progression ici.</div></div>';
+
+  const sorted=[...DB.habitStats].sort((a,b)=>b.pct-a.pct);
+  const best=sorted.slice(0,3), worst=[...sorted].reverse().slice(0,3);
+  const hasStats=DB.habitStats.length>0;
+  const list=(arr,title,cls)=>'<div class="card"><div class="eyebrow" style="margin-bottom:10px">'+title+'</div>'
+    + (hasStats? arr.map(r=>'<div class="lrow"><div class="lb"><div class="n" style="font-size:13.5px">'+(cls==='up'?'✅ ':'❌ ')+esc(r.k)+'</div></div><div class="val mono '+cls+'" style="font-size:13px">'+r.pct+'%</div></div>').join('')
+        : '<div class="note">Disponible après quelques jours de suivi.</div>')+'</div>';
+
+  const doms=[...DB.domains];
+  const domDetail='<div class="card"><div class="eyebrow" style="margin-bottom:6px">Alignement par domaine · priorité</div>'
+    + doms.map((d,i)=>{ const p=domAlign(d); return '<div class="lrow"><div class="prio">'+(i+1)+'</div><div class="ic">'+(DOM_IC[d]?I[DOM_IC[d]]:I.layers)+'</div><div class="lb"><div class="n">'+esc(d)+'</div>'
+      +'<div class="bar" style="margin-top:7px"><i style="width:'+p+'%"></i></div></div>'
+      +'<div class="val mono">'+p+'%</div></div>'; }).join('')
+    +'<button class="btn btn-ghost btn-sm" style="margin-top:12px;width:100%" data-act="sheet" data-id="domains">'+I.layers+'Réordonner mes priorités</button></div>';
+
+  const weekBtn=DB.alignHistory.length>=3
+    ? '<button class="btn btn-ghost" data-act="sheet" data-id="weekreview" style="margin-bottom:16px">'+I.chart+'Voir mon bilan de semaine</button>' : '';
+  const trackers=weekBtn+'<div class="section-head"><div class="h2">Historiques</div></div>'
+    + '<div class="quick">'
+    + qa('dumbbell','Sport','sub','sport')
+    + qa('food','Nutrition','sub','nutrition')
+    + qa('shield','Addictions','sub','addiction')
+    + '</div>';
+
+  return '<div class="view"><div class="scroll">'
+    + seg + ring + weekStrip + heat
+    + '<div class="section-head"><div class="h2">Progression réelle</div><div class="kicker">par objectif</div></div>'
+    + objs
+    + '<div class="hint" style="margin-bottom:16px">L\u2019<b style="color:var(--blanc)">alignement</b> mesure si tu fais tes actions. La <b style="color:var(--blanc)">progression</b> mesure si l\u2019objectif avance vraiment.</div>'
+    + domDetail
+    + '<div class="spacer"></div>'+list(best,'Tes points forts','up')
+    + '<div class="spacer"></div>'+list(worst,'Tes points faibles','down')
+    + trackers
+    + '</div></div>';
+}
+
+/* ============================================================
+   SCREEN : SYSTÈME (configuration de ton écosystème)
+   ============================================================ */
+let sysTab='structure';
+function screenSysteme(){
+  const seg='<div class="seg" style="margin-bottom:18px">'
+    +[['structure','Structure'],['routines','Routines'],['trackers','Trackers'],['params','Paramètres']].map(t=>
+      '<button class="'+(sysTab===t[0]?'on':'')+'" data-act="systab" data-id="'+t[0]+'">'+t[1]+'</button>').join('')+'</div>';
+
+  let body='';
+  if(sysTab==='structure'){
+    body='<div class="hint" style="margin-bottom:16px">Architecture : <b style="color:var(--blanc)">Cycle → Domaines → Objectifs → Habitudes</b>. Une habitude peut vivre dans une routine — elle n\u2019est alors jamais comptée deux fois.</div>'
+    + '<div class="card" style="margin-bottom:16px"><div class="eyebrow" style="margin-bottom:4px">Cycle actuel</div>'
+    + '<div class="h2">'+esc(DB.cycle.name)+'</div>'
+    + '<div class="note" style="margin-top:6px">Standard · Jour '+DB.cycle.day+' / '+DB.cycle.total+'</div>'
+    + '<div class="bar" style="margin-top:12px"><i style="width:'+Math.round(DB.cycle.day/DB.cycle.total*100)+'%"></i></div></div>'
+    + '<div class="section-head"><div class="h2">Domaines actifs</div></div>'
+    + '<div class="chips" style="margin-bottom:6px">'+DB.domains.map(d=>'<span class="chip dom on">'+d+'</span>').join('')
+    + '<span class="chip dom" data-act="sheet" data-id="adddomain">'+I.plus.replace('width="24" height="24"','')+' Ajouter</span></div>'
+    + '<div class="section-head"><div class="h2">Objectifs &amp; habitudes</div></div>';
+    DB.objectives.forEach(o=>{
+      const acts=objActions(o);
+      body+='<div class="card" style="margin-bottom:12px" data-act="objective" data-id="'+o.id+'">'
+        +'<div style="display:flex;align-items:center;justify-content:space-between;gap:10px">'
+        +'<div><div class="dom">'+esc(o.dom)+'</div><div class="name" style="font-size:14.5px;font-weight:600;margin-top:2px">'+esc(o.name)+'</div></div>'
+        +'<span class="type-tag">'+TYPE_LABEL[o.type]+'</span></div>';
+      if(acts.length) body+='<div class="note" style="margin-top:10px">Actions liées : '+acts.map(a=>esc(a.title)).join(' · ')+'</div>';
+      body+='</div>';
+    });
+    if(!DB.objectives.length) body+='<div class="card" style="margin-bottom:12px"><div class="note">Aucun objectif. Crée ton premier objectif, ou pars d\u2019un système depuis la Bibliothèque.</div></div>';
+    body+='<button class="btn btn-ghost" data-act="newobj">'+I.plus+'Nouvel objectif</button>';
+  }
+  else if(sysTab==='routines'){
+    body=(DB.routines.length?DB.routines.map(r=>{const p=routineProgress(r);
+      return '<div class="card" style="margin-bottom:12px" data-act="sheet" data-id="sr-'+r.id+'">'
+      +'<div style="display:flex;align-items:center;justify-content:space-between">'
+      +'<div><div class="eyebrow">'+esc(r.sub)+'</div><div class="h2" style="margin-top:3px">'+esc(r.name)+'</div></div>'
+      +'<div class="val mono" style="color:var(--or)">'+p.pct+'%</div></div>'
+      +'<div class="note" style="margin:8px 0 10px">'+esc(r.days)+(r.timed?' · horaire':' · libre')+' · '+r.steps.length+' étapes</div>'
+      +'<div class="bar"><i style="width:'+p.pct+'%"></i></div></div>';}).join('')
+      :'<div class="card" style="margin-bottom:12px"><div class="note">Aucune routine. Les routines sont des groupes d\u2019actions (matin, soir…). Tu peux en obtenir en copiant un système, ou en créer une.</div></div>')
+      +'<button class="btn btn-ghost" data-act="sheet" data-id="srnew">'+I.plus+'Créer une routine</button>'
+      +'<div class="note" style="margin-top:14px;text-align:center">Les routines reset chaque jour. Leurs stats détaillées sont dans Progression.</div>';
+  }
+  else if(sysTab==='trackers'){
+    const tk=[['Sport','dumbbell','sport','Séances & programmes'],['Nutrition','food','nutrition','Calories · macros · poids'],['Anti-addiction','shield','addiction','Suivi sans rechute'],['Lifestyle','moon','lifestyle','Sommeil · énergie · humeur…']];
+    body=tk.map(t=>'<div class="card" style="margin-bottom:11px" data-act="sub" data-id="'+t[2]+'">'
+      +'<div class="lrow" style="padding:0;border:none"><div class="ic">'+I[t[1]]+'</div>'
+      +'<div class="lb"><div class="n">'+t[0]+'</div><div class="s">'+t[3]+'</div></div>'
+      +'<span class="chev">'+I.chev+'</span></div></div>').join('');
+  }
+  else {
+    const p=DB.profile;
+    body='<div class="card"><div class="lrow"><div class="lb"><div class="n">Cycle</div><div class="s">Standard · 90 jours</div></div><span class="chev">'+I.chev+'</span></div>'
+      +'<div class="lrow"><div class="lb"><div class="n">Visibilité du profil</div><div class="s">'+(p.public?'Public':'Privé')+'</div></div><div class="toggle '+(p.public?'on':'')+'" data-act="toggle-public"></div></div>'
+      +'<div class="lrow"><div class="lb"><div class="n">Rappels quotidiens</div><div class="s">08:00 · 21:00</div></div><div class="toggle on"></div></div>'
+      +'<div class="lrow"><div class="lb"><div class="n">Système copiable</div><div class="s">Autoriser la copie</div></div><div class="toggle" data-act="toggle-copy"></div></div></div>'
+      +'<button class="btn btn-ghost" style="margin-top:16px" data-act="sheet" data-id="newcycle">'+I.plus+'Démarrer un nouveau cycle</button>'
+      +'<button class="btn btn-line" style="margin-top:10px" data-act="reset">Réinitialiser le prototype</button>';
+  }
+
+  return topbar('Configuration','Système')+'<div class="view"><div class="scroll" style="padding-top:0">'+seg+body+'</div></div>';
+}
+/* ============================================================
+   SCREEN : BIBLIOTHÈQUE (systèmes Elyos + publics)
+   ============================================================ */
+let libTab='elyos';
+function sysCard(s,pub){
+  const tags=s.tags.map(t=>'<span class="chip dom">'+t+'</span>').join('');
+  const badge = s.off ? '<span class="badge">Officiel Elyos</span>'
+    : (s.copyable?'<span class="badge">Public · copiable</span>':'<span class="badge" style="color:var(--argent);border-color:var(--line-2)">Public · vitrine</span>');
+  return '<div class="sys">'+badge
+    + '<h3>'+esc(s.name)+'</h3>'
+    + (pub?'<div class="note" style="margin:-2px 0 8px;font-size:11px">par '+esc(s.author)+'</div>':'')
+    + '<p>'+esc(s.desc)+'</p>'
+    + '<div class="tags">'+tags+'</div>'
+    + '<div class="stat-line"><span><b>'+s.obj+'</b> objectifs</span><span><b>'+s.act+'</b> habitudes</span><span><b>'+s.rout+'</b> routines</span></div>'
+    + '<div style="display:flex;gap:9px;margin-top:15px">'
+    +   ((!pub || s.copyable)
+        ? '<button class="btn btn-primary btn-sm" style="flex:1" data-act="copysys" data-id="'+s.id+'">'+I.copy+'Copier ce système</button>'
+        : '<button class="btn btn-ghost btn-sm" style="flex:1;opacity:.55;pointer-events:none">'+I.lock+'Vitrine — non copiable</button>')
+    +   '<button class="btn btn-ghost btn-sm" data-act="sheet" data-id="prev-'+s.id+'">Aperçu</button>'
+    + '</div></div>';
+}
+function screenBibliotheque(){
+  const seg='<div class="seg" style="margin:0 0 18px">'
+    +'<button class="'+(libTab==='elyos'?'on':'')+'" data-act="libtab" data-id="elyos">Officiels Elyos</button>'
+    +'<button class="'+(libTab==='public'?'on':'')+'" data-act="libtab" data-id="public">Communauté</button></div>';
+  const body = libTab==='elyos'
+    ? DB.systems.map(s=>sysCard(s,false)).join('')
+    : DB.publicSystems.map(s=>sysCard(s,true)).join('');
+  const intro='<div class="note" style="margin-bottom:16px">'+(libTab==='elyos'
+      ?'Ne pars jamais d\u2019une page blanche. Chaque système pré-configure objectifs, actions, routines et trackers.'
+      :'Systèmes rendus publics par leurs auteurs. Copie un système copiable pour démarrer un cycle en quelques secondes.')+'</div>';
+  const acad='<div class="asst-banner" data-act="go" data-screen="academie" style="margin-top:16px">'
+    + '<div class="ab-ic">'+I.book+'</div>'
+    + '<div class="ab-tx"><div class="ab-t">Académie</div><div class="ab-s">Comprendre les principes derrière chaque système</div></div>'
+    + '<span class="chev">'+I.chev+'</span></div>';
+  return topbar('Bibliothèque','Systèmes')+'<div class="view"><div class="scroll" style="padding-top:0">'+seg+intro+body+acad+'</div></div>';
+}
+
+/* ============================================================
+   SCREEN : ACADÉMIE (savoir → action)
+   ============================================================ */
+function screenAcademie(){
+  let body='<div class="note" style="margin-bottom:8px">Pas un blog. Chaque ressource se termine par une action concrète à ajouter à ton cycle.</div>';
+  for(const cat in DB.academy){
+    body+='<div class="aca-cat">'+cat+'</div>';
+    DB.academy[cat].forEach((r,i)=>{
+      body+='<div class="aca">'
+        +'<div class="kicker" style="margin-bottom:8px"><span class="dot"></span>'+cat+'</div>'
+        +'<h4>'+esc(r.t)+'</h4><div class="read">Lecture '+r.read+'</div>';
+      if(r.cta){
+        const did = r.ctaSys?('copysys|'+r.ctaSys):(r.ctaRout?('addrout|'+r.ctaRout):(r.ctaTrack?('track|'+r.ctaTrack):'note'));
+        body+='<div class="cta" data-act="acta" data-id="'+did+'">'+I.arrow+esc(r.cta)+'</div>';
+      }
+      body+='</div>';
+    });
+  }
+  return topbar('Banque de savoir','Académie')+'<div class="view"><div class="scroll" style="padding-top:0">'+body+'</div></div>';
+}
+
+/* ============================================================
+   SCREEN : PROFIL (public/privé — pas de social addictif)
+   ============================================================ */
+function cyclesSection(){
+  const c=DB.cycle, al=cycleAlignment();
+  const cur='<div class="section-head"><div class="h2">Cycle en cours</div></div>'
+    +'<div class="card tick"><div class="objline" style="margin:0 0 12px">'
+    +'<div><div class="dom">'+esc(c.type)+'</div><div class="name" style="font-size:16px;font-weight:600">'+esc(c.name)+'</div></div>'
+    +'<div style="text-align:right"><div class="mono v1" style="font-size:26px">'+al+'%</div><div class="note">jour '+c.day+'/'+c.total+'</div></div></div>'
+    +'<div class="bar gold"><i style="width:'+Math.round(c.day/c.total*100)+'%"></i></div>'
+    +'<div class="cyc-actions" style="margin-top:14px">'
+    +'<button class="btn btn-ghost btn-sm" data-act="cycledup">'+I.copy+'Dupliquer</button>'
+    +'<button class="btn btn-ghost btn-sm" data-act="cyclearchive">'+I.check+'Archiver</button>'
+    +'<button class="btn btn-ghost btn-sm" data-act="sheet" data-id="newcycle">'+I.plus+'Nouveau</button>'
+    +'</div></div>';
+
+  // comparaison des séries dupliquées
+  const series={}; DB.cycleHistory.forEach(h=>{ if(h.series){(series[h.series]=series[h.series]||[]).push(h);} });
+  let comp='';
+  Object.values(series).filter(g=>g.length>=2).forEach(g=>{
+    g.sort((a,b)=>a.score-b.score); const a=g[0], b=g[g.length-1]; const delta=b.score-a.score;
+    comp+='<div class="card"><div class="eyebrow" style="margin-bottom:12px">Comparaison · '+esc(a.name.replace(/ #\d+$/,''))+'</div>'
+      +'<div class="stats"><div class="stat"><div class="k">'+esc(a.name)+'</div><div class="v">'+a.score+'%</div></div>'
+      +'<div class="stat"><div class="k">'+esc(b.name)+'</div><div class="v" style="color:var(--or)">'+b.score+'% '+(delta>=0?'<small class="up">+'+delta+'</small>':'<small class="down">'+delta+'</small>')+'</div></div></div>'
+      +'<div class="note" style="margin-top:10px">Même structure, stats remises à zéro — tu compares deux versions du même cycle.</div></div>';
+  });
+
+  // historique par année
+  const years={}; DB.cycleHistory.forEach(h=>{(years[h.year]=years[h.year]||[]).push(h);});
+  const yk=Object.keys(years).sort((a,b)=>b-a);
+  let hist='<div class="section-head"><div class="h2">Historique</div><div class="kicker">jamais supprimé</div></div>';
+  if(yk.length){ yk.forEach(y=>{ hist+='<div class="card"><div class="eyebrow" style="margin-bottom:8px">'+y+'</div>'
+    + years[y].map(h=>'<div class="lrow"><div class="lb"><div class="n">'+esc(h.name)+'</div><div class="s">'+h.days+' j · '+h.domains.join(', ')+'</div></div><div class="val mono" style="color:var(--or)">'+h.score+'%</div></div>').join('')+'</div>'; }); }
+  else { hist+='<div class="card"><div class="note">Aucun cycle terminé pour l\u2019instant — celui en cours est ton premier. Tes cycles passés s\u2019archiveront ici, jamais supprimés.</div></div>'; }
+
+  return cur + (comp?('<div class="spacer"></div>'+comp):'') + hist;
+}
+function screenProfile(){
+  const p=DB.profile;
+  const toggleRow=(k,label)=>'<div class="lrow"><div class="lb"><div class="n">'+label+'</div></div><div class="toggle '+(p.show[k]?'on':'')+'" data-act="showtoggle" data-id="'+k+'"></div></div>';
+  return topbar('Profil','Profil')+'<div class="view"><div class="scroll" style="padding-top:0">'
+    + '<div class="card" style="text-align:center;padding:24px 18px">'
+    +   '<div class="avatar" style="width:64px;height:64px;font-size:22px;margin:0 auto 14px">NK</div>'
+    +   '<div class="h2">'+esc(p.pseudo)+'</div>'
+    +   '<div class="kicker" style="justify-content:center;margin:8px 0 12px">'+(p.public?I.globe+' Profil public':I.lock+' Profil privé')+'</div>'
+    +   '<div class="note" style="max-width:280px;margin:0 auto">'+esc(p.bio)+'</div>'
+    + '</div>'
+    + '<div class="stats" style="margin-top:14px">'
+    +   '<div class="stat"><div class="k">Alignement cycle</div><div class="v" style="color:var(--or)">'+cycleAlignment()+'%</div></div>'
+    +   '<div class="stat"><div class="k">Cycles terminés</div><div class="v">'+DB.cycleHistory.length+'</div></div>'
+    +   '<div class="stat"><div class="k">Jour de cycle</div><div class="v">'+DB.cycle.day+'<small>/'+DB.cycle.total+'</small></div></div>'
+    +   '<div class="stat"><div class="k">Systèmes publics</div><div class="v">1</div></div>'
+    + '</div>'
+    + (p.show.domaines
+        ? '<div class="section-head"><div class="h2">Domaines</div></div>'
+          + '<div class="chips">'+DB.domains.map(d=>'<span class="chip dom on">'+d+'</span>').join('')+'</div>'
+        : '')
+    + cyclesSection()
+    + '<div class="section-head"><div class="h2">Visibilité publique</div></div>'
+    + '<div class="card">'
+    +   toggleRow('domaines','Mes domaines')
+    +   toggleRow('cycles','Mes cycles publics')
+    +   toggleRow('systemes','Mes systèmes publics')
+    +   toggleRow('progression','Ma progression générale')
+    +   toggleRow('alignement','Mon alignement moyen')
+    + '</div>'
+    + '<div class="hint" style="margin-top:16px">Elyos n\u2019a pas de feed, de messagerie, de likes ni de scroll infini. Le social sert à s\u2019inspirer de systèmes, pas à scroller. <span style="color:var(--argent)">Des classements privés entre amis arriveront en V2.</span></div>'
+    + '</div></div>';
+}
+/* ============================================================
+   SUB-SCREENS (trackers détaillés + détail objectif)
+   ============================================================ */
+/* ============================================================
+   ASSISTANT ELYOS (scripté — propose un système à partir d'une intention)
+   ============================================================ */
+const ASST_INTENTS=[
+  {keys:['muscle','masse','prendre du','gross','sport','salle','muscu','fort'],block:{dom:'Sport',objName:'Prendre 5 kg proprement',type:'mesurable',target:77,unit:'kg',start:72,current:73,habits:['Salle 4×/semaine','Suivi des calories','Dormir 8 h']}},
+  {keys:['productif','productivité','focus','concentr','travail','bosser','efficace'],block:{dom:'Business',objName:'Être plus productif',type:'manuel',habits:['Deep Work 2 h','Planifier sa journée','Zéro réseaux le matin']}},
+  {keys:['entrepri','business','lancer','projet','startup','side project','produit'],block:{dom:'Business',objName:'Lancer mon projet',type:'etapes',habits:['Exécution 1 h/jour','Parler à 1 utilisateur']}},
+  {keys:['étude','etude','examen','révis','revis','école','ecole','cours','partiel'],block:{dom:'Études',objName:'Réussir mes examens',type:'manuel',habits:['Révisions espacées','Deep Work','Sommeil régulier']}},
+  {keys:['nicotine','fumer','clope','tabac','arrêter','arreter','porn','alcool','sucre','addict','sevr'],block:{dom:'Addictions',objName:'30 jours sans rechute',type:'streak',target:30,unit:'jours',current:0,habits:['Aucune rechute aujourd\u2019hui','Remplacer le déclencheur','Méditation 10 min']}},
+  {keys:['lire','lecture','livre','bouquin'],block:{dom:'Personnel',objName:'Lire 12 livres',type:'quantitatif',target:12,unit:'livres',current:0,habits:['Lecture 30 min']}},
+  {keys:['discipline','glow','reset','dopamine','routine','constance','rigueur'],block:{dom:'Lifestyle',objName:'Discipline — 30 jours',type:'streak',target:30,unit:'jours',current:0,habits:['Routine matin','Sport','Coucher avant 23h30']}},
+  {keys:['dormir','sommeil','fatigue','repos','récup'],block:{dom:'Lifestyle',objName:'Sommeil stable 8 h',type:'manuel',habits:['Coucher avant 23h30','Pas d\u2019écran au lit']}},
+  {keys:['confian','estime','mental','anxi','stress','calme'],block:{dom:'Personnel',objName:'Devenir plus confiant',type:'manuel',habits:['Méditation 10 min','Journaling du soir']}}
+];
+function assistantEngine(text){
+  const t=(text||'').toLowerCase();
+  const blocks=[];
+  ASST_INTENTS.forEach(it=>{ if(it.keys.some(k=>t.includes(k)) && !blocks.find(b=>b.dom===it.block.dom)) blocks.push(it.block); });
+  const matched = blocks.length>0;
+  if(!blocks.length){ blocks.push(ASST_INTENTS[0].block, ASST_INTENTS[6].block); } // démarrage sain par défaut
+  return {blocks:blocks.slice(0,3), matched};
+}
+function proposalCards(blocks){
+  return (blocks||[]).map(b=>'<div class="card"><div class="dom" style="color:var(--or)">'+esc(b.dom)+'</div>'
+    +'<div class="name" style="font-size:15px;font-weight:600;margin:2px 0 4px">'+esc(b.objName)+'</div>'
+    +'<div class="note" style="margin-bottom:8px">Objectif '+(TYPE_LABEL[b.type]||'').toLowerCase()+'</div>'
+    + (b.habits||[]).map(h=>'<div class="rstep done" style="padding:8px 0;cursor:default"><div class="rdot">'+I.check+'</div><div class="rl">'+esc(h)+'</div></div>').join('')
+    +'</div>').join('');
+}
+const OBJ_TYPE_GUESS=[
+  {re:/\d+\s*(kg|kilo)|perdre|prendre du poids|peser/i, type:'mesurable'},
+  {re:/jours? sans|streak|arrêt|sevrage|nicotine|clope|alcool|porn|sucre/i, type:'streak'},
+  {re:/^lire|livres?|pages?|séances?|\d+\s*(fois|x)|courir|km\b/i, type:'quantitatif'},
+  {re:/créer|lancer|construire|étapes?|trouver|obtenir|décrocher/i, type:'etapes'},
+];
+function guessObjType(name){
+  const n=(name||'').toLowerCase();
+  for(const g of OBJ_TYPE_GUESS){ if(g.re.test(n)) return g.type; }
+  return 'manuel';
+}
+function syncObjFields(){
+  if(!tmpObj) return;
+  const n=$('#objName'); if(n) tmpObj.name=n.value;
+  const tg=$('#objTarget'); if(tg) tmpObj.target=tg.value;
+  const un=$('#objUnit'); if(un) tmpObj.unit=un.value;
+  const dt=$('#objDate'); if(dt) tmpObj.date=dt.value;
+}
+function tplToBlocks(tpl){
+  return (tpl.objs||[]).map((od,i)=>({dom:od.dom,objName:od.n,type:od.type,habits:(tpl.habits||[]).filter(h=>h.obj===i).map(h=>h.t)}));
+}
+function subAssistant(){
+  const sugg=['Je veux prendre du muscle et être plus productif','Arrêter la nicotine','Réussir mes études','Reprise en main complète'];
+  let body='<div class="hint" style="margin-bottom:16px">Décris ce que tu veux devenir. L\u2019assistant te propose un système — domaines, objectifs et habitudes — que tu peux créer en un geste.</div>';
+  body+='<div class="field"><textarea id="asstInput" rows="3" placeholder="Ex. Je veux prendre du muscle et être plus productif…">'+esc(asst.last||'')+'</textarea></div>';
+  body+='<div class="chips" style="margin-bottom:8px">'+sugg.map(s=>'<span class="chip" data-act="asstsugg" data-id="'+esc(s)+'">'+esc(s)+'</span>').join('')+'</div>';
+  body+='<button class="btn btn-primary" data-act="asstsend">'+I.spark+'Proposer un système</button>';
+  if(asst.proposal){
+    body+='<div class="section-head" style="margin-top:8px"><div class="h2">Système proposé</div><div class="kicker"><span class="dot"></span>'+asst.proposal.length+' domaine'+(asst.proposal.length>1?'s':'')+'</div></div>';
+    if(!asst.matched){ body+='<div class="hint" style="margin-bottom:14px">Je n\u2019ai pas identifié d\u2019intention précise dans ta phrase — voici une proposition de démarrage simple à ajuster, plutôt qu\u2019une vraie compréhension de ta demande.</div>'; }
+    body+=proposalCards(asst.proposal);
+    body+='<button class="btn btn-primary" style="margin-top:6px" data-act="asstcreate">'+I.plus+'Créer ce système</button>';
+    body+='<button class="btn btn-line" style="margin-top:10px" data-act="asstreset">Recommencer</button>';
+    body+='<div class="note" style="margin-top:12px;text-align:center">Proposition générée localement (prototype). En V1, l\u2019IA s\u2019adaptera vraiment à toi.</div>';
+  }
+  return subHeader('Assistant Elyos','Construis ton système')+'<div class="view"><div class="scroll" style="padding-top:0">'+body+'</div></div>';
+}
+function subHeader(title,eyebrow){
+  return '<div class="topbar"><div style="display:flex;align-items:center;gap:12px">'
+    + '<button class="sh-close" data-act="back">'+'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="m15 6-6 6 6 6"/></svg>'+'</button>'
+    + '<div><div class="eyebrow">'+esc(eyebrow)+'</div><div class="h1" style="font-size:21px">'+esc(title)+'</div></div></div></div>';
+}
+
+/* --- SPORT (modèle inspiré de Hevy, sans copie) --- */
+let restEnd=null, sportTimer=null;
+function vol(ex){return ex.reduce((v,e)=>v+e.sets.reduce((x,s)=>x+(s.done?s.kg*s.reps:0),0),0);}
+function setsDone(ex){return ex.reduce((n,e)=>n+e.sets.filter(s=>s.done).length,0);}
+function setsTot(ex){return ex.reduce((n,e)=>n+e.sets.length,0);}
+function fmtDur(ms){const t=Math.max(0,Math.floor(ms/1000)),h=Math.floor(t/3600),m=Math.floor(t%3600/60),s=t%60;return (h?h+':'+String(m).padStart(2,'0'):m)+':'+String(s).padStart(2,'0');}
+/* ============================================================
+   ILLUSTRATIONS MUSCULAIRES (SVG inline — style Hevy, DA Elyos)
+   ============================================================ */
+const MUSCLE_SHAPES={
+  Pectoraux:'<path d="M20.5 26 Q25 23 29.5 26 L29.5 32 Q25 34.5 20.5 32 Z"/>',
+  Épaules:'<circle cx="18.5" cy="26.5" r="3.6"/><circle cx="31.5" cy="26.5" r="3.6"/>',
+  Triceps:'<path d="M15.6 30 L17.6 30 L17.2 38 L15.2 38 Z"/><path d="M34.4 30 L32.4 30 L32.8 38 L34.8 38 Z"/>',
+  Biceps:'<path d="M17.4 30.5 Q19 33 18.4 37.5 L16.4 37.5 Q16.2 33 16.6 30.5 Z"/><path d="M32.6 30.5 Q31 33 31.6 37.5 L33.6 37.5 Q33.8 33 33.4 30.5 Z"/>',
+  Dos:'<path d="M20 25 Q25 22.5 30 25 L31 36 Q25 38.5 19 36 Z"/>',
+  Jambes:'<path d="M21.5 46 L24 46 L23.6 60 L21 60 Z"/><path d="M28.5 46 L26 46 L26.4 60 L29 60 Z"/>',
+  Ischios:'<path d="M21.4 50 L24 50 L23.7 61 L21.2 61 Z"/><path d="M28.6 50 L26 50 L26.3 61 L28.8 61 Z"/>',
+  Mollets:'<path d="M21.6 62 L23.8 62 L23.5 70 L21.6 70 Z"/><path d="M28.4 62 L26.2 62 L26.5 70 L28.4 70 Z"/>',
+  Abdos:'<rect x="22.4" y="34" width="5.2" height="10" rx="1.6"/>'
+};
+/* Silhouette humaine stylisée, muscle ciblé en or */
+function muscleSVG(grp,size){
+  const s=size||44;
+  const hi=MUSCLE_SHAPES[grp]||'';
+  return '<svg class="msvg" viewBox="0 0 50 76" width="'+s+'" height="'+Math.round(s*1.52)+'" aria-hidden="true">'
+    +'<g fill="none" stroke="var(--titane-2)" stroke-width="1.2" stroke-linejoin="round" stroke-linecap="round">'
+    +'<circle cx="25" cy="10" r="5.2"/>'
+    +'<path d="M25 15.4 L25 20"/>'
+    +'<path d="M17.5 22 Q25 19.4 32.5 22 L33.6 37 Q25 40 16.4 37 Z"/>'
+    +'<path d="M17.5 23.5 Q14.4 26 15 31 L15.6 39.5"/>'
+    +'<path d="M32.5 23.5 Q35.6 26 35 31 L34.4 39.5"/>'
+    +'<path d="M17.4 37.6 L18.6 45.6 M32.6 37.6 L31.4 45.6"/>'
+    +'<path d="M18.6 45.6 Q25 47.4 31.4 45.6"/>'
+    +'<path d="M21 46.6 L20.8 61 L21.4 70.6 M29 46.6 L29.2 61 L28.6 70.6"/>'
+    +'</g>'
+    +(hi?'<g fill="var(--or)" opacity=".92">'+hi+'</g>':'')
+    +'</svg>';
+}
+function exMuscle(exId){
+  const l=DB.sport.library.find(x=>x.id===exId);
+  return l?l.grp:'';
+}
+function prevSet(id){const p=(DB.sport.prev[id]||'').match(/(\d+)\s*kg\s*×\s*(\d+)/);return p?{kg:+p[1],reps:+p[2]}:{kg:0,reps:0};}
+
+function subSport(){
+  if(state.sub && state.sub.view==='session' && DB.sport.active) return sportSession();
+  return sportHome();
+}
+
+function sportHome(){
+  const sp=DB.sport; let body='';
+  if(sp.active){const a=sp.active;
+    body+='<div class="card tick" data-act="resumesession" style="margin-bottom:18px">'
+      +'<div class="kicker" style="color:var(--or);margin-bottom:10px"><span class="dot" style="background:var(--or)"></span>Séance en cours</div>'
+      +'<div style="display:flex;align-items:center;justify-content:space-between;gap:12px">'
+      +'<div><div class="h2">'+esc(a.nm)+'</div><div class="note" style="margin-top:3px">'+setsDone(a.ex)+'/'+setsTot(a.ex)+' séries · '+esc(a.sub)+'</div></div>'
+      +'<button class="btn btn-primary btn-sm" data-act="resumesession">Reprendre</button></div></div>';
+  }
+
+  // Bandeau de stats (semaine)
+  const totalVol=sp.history.reduce((n,h)=>n+h.vol,0);
+  const totalSets=sp.history.reduce((n,h)=>n+h.sets,0);
+  body+='<div class="stats" style="margin-bottom:18px">'
+    +'<div class="stat"><div class="k">Séances</div><div class="v">'+sp.history.length+'</div></div>'
+    +'<div class="stat"><div class="k">Volume total</div><div class="v">'+(totalVol>=1000?Math.round(totalVol/1000)+'<small> t</small>':totalVol+'<small> kg</small>')+'</div></div>'
+    +'<div class="stat"><div class="k">Séries</div><div class="v">'+totalSets+'</div></div></div>';
+
+  body+='<div class="section-head"><div class="h2">Démarrer une séance</div></div>';
+  sp.templates.forEach(t=>{
+    const grps=[...new Set(t.exIds.map(id=>exMuscle(id)).filter(Boolean))];
+    const exNames=t.exIds.map(id=>{const l=sp.library.find(x=>x.id===id);return l?l.nm:id;});
+    body+='<div class="wcard" data-act="startsession" data-id="'+t.id+'">'
+      +'<div class="wfig">'+muscleSVG(grps[0],46)+'</div>'
+      +'<div class="wbody">'
+      +'<div class="wname">'+esc(t.nm)+'</div>'
+      +'<div class="wmeta">'+t.exIds.length+' exercices · '+esc(t.sub)+'</div>'
+      +'<div class="wtags">'+grps.slice(0,3).map(g=>'<span class="wtag">'+esc(g)+'</span>').join('')+'</div>'
+      +'<div class="wex">'+exNames.slice(0,3).map(n=>esc(n)).join(' · ')+(exNames.length>3?' +'+(exNames.length-3):'')+'</div>'
+      +'</div><span class="chev">'+I.chev+'</span></div>';
+  });
+  body+='<button class="btn btn-ghost" data-act="startsession" data-id="empty" style="margin-top:8px">'+I.plus+'Séance vide</button>';
+
+  body+='<div class="section-head" style="margin-top:10px"><div class="h2">Historique</div></div>';
+  body+= sp.history.length ? '<div class="card">'+sp.history.map(h=>
+    '<div class="lrow"><div class="ic">'+I.dumbbell+'</div><div class="lb"><div class="n">'+esc(h.nm)+'</div><div class="s">'+esc(h.date)+' · '+esc(h.dur)+' · '+h.sets+' séries</div></div>'
+    +'<div class="val mono">'+h.vol.toLocaleString('fr-FR')+'<small> kg</small></div></div>').join('')+'</div>'
+    : '<div class="card"><div class="note">Aucune séance enregistrée. Lance ton premier entraînement ci-dessus.</div></div>';
+  return subHeader('Sport','Tracker · séances & programmes')+'<div class="view"><div class="scroll" style="padding-top:0">'+body+'</div></div>';
+}
+
+function sportSession(){
+  const a=DB.sport.active, sp=DB.sport;
+  const header='<div class="topbar"><div style="display:flex;align-items:center;gap:12px;min-width:0">'
+    +'<button class="sh-close" data-act="sportback"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="m15 6-6 6 6 6"/></svg></button>'
+    +'<div style="min-width:0"><div class="eyebrow">En cours · <span id="sessChrono">'+fmtDur(Date.now()-a.started)+'</span></div><div class="h1" style="font-size:20px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">'+esc(a.nm)+'</div></div></div>'
+    +'<button class="btn btn-primary btn-sm" data-act="finishworkout" style="padding:9px 13px;flex:0 0 auto">Terminer</button></div>';
+
+  let body='<div class="stats" style="margin-bottom:16px">'
+    +'<div class="stat"><div class="k">Durée</div><div class="v" id="sessChrono2">'+fmtDur(Date.now()-a.started)+'</div></div>'
+    +'<div class="stat"><div class="k">Volume</div><div class="v">'+vol(a.ex).toLocaleString('fr-FR')+'<small> kg</small></div></div>'
+    +'<div class="stat"><div class="k">Séries</div><div class="v">'+setsDone(a.ex)+'<small>/'+setsTot(a.ex)+'</small></div></div></div>';
+
+  if(!a.ex.length) body+='<div class="note" style="text-align:center;padding:26px 0">Aucun exercice pour l\u2019instant. Ajoute ton premier mouvement.</div>';
+
+  a.ex.forEach((e,ei)=>{
+    body+='<div class="ex"><div class="exh">'
+      +'<div class="exfig">'+muscleSVG(e.grp,30)+'</div>'
+      +'<div class="nm">'+esc(e.nm)+(e.grp?'<span class="exgrp">'+esc(e.grp)+'</span>':'')+'</div>'
+      +'<button class="exmenu" data-act="delexercise" data-e="'+ei+'">'+I.x+'</button></div>'
+      +'<div class="sethead"><div>Série</div><div>Précédent</div><div>kg</div><div>Reps</div><div></div></div>';
+    e.sets.forEach((s,si)=>{
+      body+='<div class="setrow'+(s.done?' done':'')+'"><div class="sn">'+(si+1)+'</div>'
+        +'<div class="prev">'+esc(sp.prev[e.id]||'—')+'</div>'
+        +'<input class="cell" type="number" inputmode="decimal" value="'+s.kg+'" data-act="setval" data-e="'+ei+'" data-s="'+si+'" data-f="kg">'
+        +'<input class="cell" type="number" inputmode="numeric" value="'+s.reps+'" data-act="setval" data-e="'+ei+'" data-s="'+si+'" data-f="reps">'
+        +'<div class="setdone '+(s.done?'on':'')+'" data-act="setdone" data-e="'+ei+'" data-s="'+si+'">'+I.checkw+'</div></div>';
+    });
+    body+='<div style="padding:9px 15px"><button class="btn btn-ghost btn-sm" style="width:100%;font-size:12px" data-act="addset" data-e="'+ei+'">'+I.plus+'Ajouter une série</button></div></div>';
+  });
+
+  body+='<button class="btn btn-ghost" data-act="openlibrary" style="margin-top:4px">'+I.plus+'Ajouter un exercice</button>'
+    +'<button class="btn btn-primary" data-act="finishworkout" style="margin-top:18px">Terminer la séance</button>'
+    +'<button class="btn btn-line" data-act="cancelsession" style="margin-top:10px">Annuler la séance</button>';
+
+  let rest='';
+  if(restEnd){const rem=Math.max(0,restEnd-Date.now());
+    rest='<div class="restbar" id="restBar"><div class="rt">Repos · <span id="restPill">'+fmtDur(rem)+'</span></div>'
+      +'<div class="ra"><button data-act="restadd">+15 s</button><button data-act="restskip">Passer</button></div></div>';}
+
+  return header+'<div class="view"><div class="scroll" style="padding-top:0">'+body+'</div>'+rest+'</div>';
+}
+
+function sportTick(){
+  const a=DB.sport.active; if(!a){ensureSportTimer(false);return;}
+  const c1=$('#sessChrono'),c2=$('#sessChrono2'),d=fmtDur(Date.now()-a.started);
+  if(c1)c1.textContent=d; if(c2)c2.textContent=d;
+  if(restEnd){const rem=restEnd-Date.now(),rp=$('#restPill'),rb=$('#restBar');
+    if(rem<=0){restEnd=null; if(rb)rb.remove(); toast('Repos terminé');}
+    else if(rp)rp.textContent=fmtDur(rem);}
+}
+function ensureSportTimer(on){
+  if(on){ if(!sportTimer) sportTimer=setInterval(sportTick,1000); }
+  else if(sportTimer){ clearInterval(sportTimer); sportTimer=null; }
+}
+
+/* --- NUTRITION --- */
+function subNutrition(){
+  const n=DB.nutrition;
+  const tot=nutritionTotalToday();
+  const pct=Math.round(tot.k/n.goalKcal*100);
+  const ring='<div class="card tick" style="text-align:center;padding-top:20px">'
+    +'<div class="dial" style="width:160px;height:160px;margin:0 auto">'+dialSVG(clamp(pct,0,100),100)
+    +'<div class="face"><div class="pct" style="font-size:30px">'+tot.k+'</div><div class="lbl">/ '+n.goalKcal+' kcal</div></div></div>'
+    +'<div class="macro"><div class="m"><div class="mlbl">Protéines</div><div class="bar green"><i style="width:'+clamp(tot.p/n.goalP*100,0,100)+'%"></i></div><div class="mval up">'+tot.p+'/'+n.goalP+'g</div></div>'
+    +'<div class="m"><div class="mlbl">Glucides</div><div class="bar silver"><i style="width:60%"></i></div><div class="mval">198/'+n.goalC+'g</div></div>'
+    +'<div class="m"><div class="mlbl">Lipides</div><div class="bar silver"><i style="width:48%"></i></div><div class="mval">43/'+n.goalF+'g</div></div></div></div>';
+  let meals='';
+  n.meals.forEach((m,mi)=>{
+    meals+='<div class="meal"><div class="mh"><div class="mn">'+esc(m.n)+'</div>'
+      +'<button class="btn btn-ghost btn-sm" style="font-size:11px;padding:7px 11px" data-act="addfood" data-m="'+mi+'">'+I.plus+'Aliment</button></div>';
+    if(m.items.length) m.items.forEach(it=>{meals+='<div class="fooditem"><div class="fn">'+esc(it.f)+'</div><div class="fk">'+it.k+' kcal · '+it.p+'g P</div></div>';});
+    else meals+='<div class="note" style="padding:6px 0">Aucun aliment ajouté.</div>';
+    meals+='</div>';
+  });
+  const weight='<div class="card" style="margin-top:18px"><div class="lrow" style="padding:0;border:none"><div class="ic">'+I.pulse+'</div>'
+    +'<div class="lb"><div class="n">Poids actuel</div><div class="s">objectif prise de masse — 77 kg</div></div><div class="val mono" style="color:var(--or)">'+n.weight+' kg</div></div></div>';
+  return subHeader('Nutrition','Tracker · 3000 kcal')+'<div class="view"><div class="scroll" style="padding-top:0">'+ring+weight+meals
+    +'<div class="note" style="text-align:center;margin-top:16px">V1 sans IA photo. L\u2019analyse photo / réalité augmentée arrive plus tard.</div></div></div>';
+}
+
+/* --- ADDICTION --- */
+function subAddiction(){
+  const a=DB.addiction;
+  const dots=a.log.map(v=>'<div class="ddot '+(v===1?'ok':(v===0?'':'relapse'))+'"></div>').join('')
+    + Array.from({length:30-a.log.length}).map(()=>'<div class="ddot"></div>').join('');
+  return subHeader('Nicotine','Anti-addiction · J18 / 30')+'<div class="view"><div class="scroll" style="padding-top:0">'
+    +'<div class="card tick"><div class="streak"><div class="big">'+a.clean+'</div><div class="u">jours sans rechute</div></div>'
+    +'<div class="dots">'+dots+'</div>'
+    +'<div class="note" style="text-align:center;margin-top:8px">Départ le '+esc(a.start)+'</div></div>'
+    +'<div class="stats" style="margin-top:14px">'
+    +'<div class="stat"><div class="k">Meilleur streak</div><div class="v">'+a.best+'<small> j</small></div></div>'
+    +'<div class="stat"><div class="k">Rechutes</div><div class="v">'+a.relapses+'</div></div>'
+    +'<div class="stat"><div class="k">Argent économisé</div><div class="v" style="color:var(--or)">'+a.saved+'<small> €</small></div></div>'
+    +'<div class="stat"><div class="k">Temps gagné</div><div class="v">'+esc(a.timeGained)+'</div></div></div>'
+    +'<div class="section-head"><div class="h2">Déclencheurs</div></div>'
+    +'<div class="chips">'+a.triggers.map(t=>'<span class="chip dom on">'+esc(t)+'</span>').join('')+'</div>'
+    +'<button class="btn btn-ghost" style="margin-top:20px" data-act="sheet" data-id="sa">Noter une rechute</button>'
+    +'<div class="note" style="text-align:center;margin-top:16px">Sobre, respectueux, non culpabilisant. Une rechute n\u2019efface pas ta progression.</div>'
+    +'</div></div>';
+}
+
+/* --- LIFESTYLE --- */
+function subLifestyle(){
+  const body=DB.lifestyle.map(l=>'<div class="card" style="margin-bottom:11px"><div class="lrow" style="padding:0;border:none">'
+    +'<div class="ic">'+I[l.ic]+'</div><div class="lb"><div class="n">'+esc(l.k)+'</div>'
+    +'<div class="bar" style="margin-top:8px"><i style="width:'+l.pct+'%"></i></div></div>'
+    +'<div class="val mono">'+esc(l.v)+'</div></div></div>').join('');
+  return subHeader('Lifestyle','Mode de vie global')+'<div class="view"><div class="scroll" style="padding-top:0">'
+    +'<div class="note" style="margin-bottom:16px">Tu choisis ce que tu suis. Rien n\u2019est imposé.</div>'+body
+    +'<button class="btn btn-ghost" style="margin-top:6px" data-act="sheet" data-id="lifeadd">'+I.plus+'Suivre un indicateur</button>'
+    +'</div></div>';
+}
+
+/* --- DÉTAIL OBJECTIF : Objectif → Actions → Progression + Alignement --- */
+function subObjective(id){
+  const o=DB.objectives.find(x=>x.id===id);
+  const prog=objProg(o), alDetail=objAlignDetail(o);
+
+  const alignSub = alDetail
+    ? '<div class="align-sub"><span class="align-pill"><i class="align-dot"></i>Alignement '+alDetail.pct+'%</span><span class="align-detail">'+alDetail.done+'/'+alDetail.tot+' habitudes faites aujourd\u2019hui</span></div>'
+    : '<div class="align-sub"><span class="align-pill off"><i class="align-dot"></i>Alignement —</span><span class="align-detail">Ajoute des actions pour le mesurer</span></div>';
+
+  const gauges='<div class="card"><div class="gz-k">Résultat réel</div>'
+    + '<div class="gz-v gold" style="font-size:42px">'+prog+'%</div>'
+    + '<div class="gz-s">'+esc(objResult(o))+'</div>'
+    + '<div class="bar gold" style="margin-top:10px"><i style="width:'+prog+'%"></i></div>'
+    + alignSub
+    + '</div>';
+
+  let panel='';
+  if(o.type==='mesurable'){
+    panel='<div class="card"><div class="eyebrow">Mesure · '+esc(o.unit)+'</div>'
+      +'<div class="objline">'
+      +'<div><div class="note">Départ</div><div class="mono v2">'+frNum(o.start)+'</div></div>'
+      +'<div style="text-align:center"><div class="note">Actuel</div><div class="mono v1">'+frNum(o.current)+'</div></div>'
+      +'<div style="text-align:right"><div class="note">Cible</div><div class="mono v2">'+o.target+'</div></div></div>'
+      +'<button class="btn btn-primary" style="margin-top:14px" data-act="sheet" data-id="ci-'+o.id+'">'+I.target+'Mettre à jour la valeur</button></div>';
+  } else if(o.type==='quantitatif'){
+    panel='<div class="card" style="text-align:center"><div class="eyebrow" style="text-align:left">Quantité</div>'
+      +'<div class="mono" style="font-size:36px;color:var(--or);margin:12px 0 2px">'+o.current+'<span style="color:var(--argent-2);font-size:19px"> / '+o.target+'</span></div>'
+      +'<div class="note" style="margin-bottom:14px">'+esc(o.unit)+'</div>'
+      +'<div style="display:flex;gap:9px"><button class="btn btn-ghost" data-act="qtyminus" data-id="'+o.id+'" style="flex:0 0 54px">−1</button>'
+      +'<button class="btn btn-primary" data-act="qtyplus" data-id="'+o.id+'" style="flex:1">'+I.plus+'Enregistrer +1</button></div></div>';
+  } else if(o.type==='etapes'){
+    panel='<div class="card"><div class="eyebrow" style="margin-bottom:8px">Étapes</div>'
+      + (o.steps.length?o.steps.map((s,i)=>'<div class="rstep '+(s.done?'done':'')+'"><div class="rdot" data-act="objstep" data-id="'+o.id+'" data-i="'+i+'">'+I.check+'</div><div class="rl" data-act="objstep" data-id="'+o.id+'" data-i="'+i+'">'+esc(s.t)+'</div><button class="actdel" data-act="delstep" data-id="'+o.id+'" data-i="'+i+'">'+I.x+'</button></div>').join(''):'<div class="note" style="padding:2px 0 8px">Aucune étape. Décompose ton objectif en jalons.</div>')
+      +'<button class="btn btn-ghost btn-sm" style="margin-top:10px;width:100%" data-act="addstep" data-id="'+o.id+'">'+I.plus+'Ajouter une étape</button></div>';
+  } else if(o.type==='streak'){
+    panel='<div class="card tick" style="text-align:center;padding-top:18px"><div class="streak"><div class="big">'+o.current+'</div><div class="u">jours / '+o.target+'</div></div>'
+      +'<div class="bar gold" style="margin:16px 0"><i style="width:'+prog+'%"></i></div>'
+      +'<div style="display:flex;gap:9px"><button class="btn btn-primary" data-act="streakplus" data-id="'+o.id+'" style="flex:1">'+I.plus+'+1 jour tenu</button>'
+      +'<button class="btn btn-line" data-act="streakreset" data-id="'+o.id+'" style="flex:0 0 92px">Rechute</button></div></div>';
+  } else if(o.type==='tracker'){
+    panel='<div class="card"><div class="eyebrow">Suivi via tracker · '+esc(o.unit||'')+'</div>'
+      +'<div class="mono" style="font-size:34px;color:var(--or);text-align:center;margin:12px 0 2px">'+frNum(o.current)+'<span style="color:var(--argent-2);font-size:18px"> / '+o.target+'</span></div>'
+      +'<div class="note" style="text-align:center;margin-bottom:14px">'+I.spark+' Synchronisé avec ton tracker</div>'
+      +'<button class="btn btn-primary" data-act="sheet" data-id="ci-'+o.id+'">'+I.target+'Mettre à jour la mesure</button></div>';
+  } else if(o.type==='manuel'){
+    panel='<div class="card"><div class="eyebrow" style="margin-bottom:6px">Avancement estimé</div>'
+      +'<div class="mono" style="font-size:40px;text-align:center;color:var(--or);margin:6px 0">'+(o.current||0)+'%</div>'
+      +'<input type="range" min="0" max="100" value="'+(o.current||0)+'" data-act="manualset" data-id="'+o.id+'" style="width:100%;accent-color:var(--or)">'
+      +'<div class="note" style="margin-top:10px;text-align:center">Ajuste à la main après réflexion — utile quand le résultat n\u2019est pas chiffrable.</div></div>';
+  }
+
+  const acts=objActions(o);
+  const doneCnt=acts.filter(a=>actionDone(a)).length;
+  let actBlock='<div class="section-head"><div class="h2">Habitudes</div><div class="kicker"><span class="dot"></span>'+doneCnt+'/'+acts.length+' faites</div></div>';
+  actBlock+= acts.length
+    ? acts.map(a=>'<div class="actrow '+(actionDone(a)?'done':'')+'">'
+        +'<div class="check" data-act="toggle" data-id="'+a.id+'">'+I.check+'</div>'
+        +'<div class="ab" data-act="actedit" data-id="'+a.id+'"><div class="t">'+esc(a.title)+'</div><div class="meta">'+freqLabel(a.freq)+' · '+esc(a.dom)+'</div></div>'
+        +'<button class="actdel" data-act="actdelete" data-id="'+a.id+'">'+I.x+'</button></div>').join('')
+    : '<div class="note" style="padding:4px 0 8px">Aucune habitude liée. Ajoute la première habitude qui fera avancer cet objectif.</div>';
+  actBlock+='<button class="btn btn-ghost" data-act="objaddaction" data-id="'+o.id+'" style="margin-top:8px">'+I.plus+'Ajouter une habitude</button>';
+
+  const hint='<div class="hint" style="margin:16px 0 18px">Tes <b style="color:var(--blanc)">actions</b> nourrissent ton <b style="color:var(--blanc)">alignement</b> (faire le travail). La <b style="color:var(--blanc)">progression</b> mesure le résultat réel : '+typeExplain(o.type)+'</div>';
+
+  return subHeader(o.name,o.dom+' · '+TYPE_LABEL[o.type]+(o.targetDate?' · '+o.targetDate:''))+'<div class="view"><div class="scroll" style="padding-top:0">'
+    + gauges + hint + panel + actBlock + '</div></div>';
+}
+/* ============================================================
+   ONBOARDING (< 2 min)
+   ============================================================ */
+const OB_DOMAINS=['Sport','Santé','Nutrition','Études','Business','Travail','Lifestyle','Mental','Digital','Addictions'];
+function screenOnboarding(){
+  const s=state.ob.step;
+  if(s===0) return obIntro();
+  const bars='<div class="ob-progress">'+[1,2,3,4].map(i=>'<i class="'+(i<=s?'on':'')+'"></i>').join('')+'</div>';
+  let body='',foot='',canNext=false;
+
+  if(s===1){
+    body='<h1>Choisis la durée de ton cycle</h1>'
+      +'<div class="lede">Un cycle est une période de transformation. Tu pourras l\u2019ajuster plus tard.</div>'
+      + obOpt('30','Cycle court','30 jours · momentum rapide',state.ob.cycle==='30')
+      + obOpt('90','Cycle standard','90 jours · le bon équilibre',state.ob.cycle==='90',true)
+      + obOpt('180','Cycle long','180 jours · transformation profonde',state.ob.cycle==='180');
+  }
+  else if(s===2){
+    const n=state.ob.domains.length;
+    body='<h1>Sur quoi veux-tu avancer ?</h1>'
+      +'<div class="lede">2 à 4 domaines, pas plus — pour rester concentré. Tu pourras en ajouter plus tard.</div>'
+      +'<div class="chips">'+OB_DOMAINS.map(d=>'<span class="chip '+(state.ob.domains.includes(d)?'on':'')+'" data-act="obdom" data-id="'+d+'">'+d+'</span>').join('')+'</div>'
+      +'<div class="note" style="margin-top:12px">'+n+'/4'+(n<2?' · choisis-en au moins 2':'')+'</div>';
+    canNext=n>=2;
+  }
+  else if(s===3){
+    const mode=state.ob.mode;
+    if(!mode){
+      body='<h1>Comment veux-tu démarrer ?</h1>'
+        +'<div class="lede">Pour ne pas partir d\u2019une page blanche. Tu personnaliseras ensuite.</div>'
+        + obModeOpt('ai','Décrire mon objectif','L\u2019assistant construit ton système',true)
+        + obModeOpt('system','Choisir un système Elyos','Un système officiel prêt à l\u2019emploi')
+        + obModeOpt('scratch','Partir de zéro','Je construis tout moi-même');
+    } else if(mode==='ai'){
+      const sugg=['Prendre du muscle et être plus productif','Arrêter la nicotine','Réussir mes études','Reprise en main complète'];
+      body='<div class="ob-back-link" data-act="obmodeback">'+I.chev+' Changer de méthode</div>'
+        +'<h1>Décris ce que tu veux devenir</h1>'
+        +'<div class="lede">L\u2019assistant te propose des objectifs et habitudes que tu valides ensuite.</div>'
+        +'<div class="field"><textarea id="obText" rows="3" placeholder="Ex. Je veux prendre du muscle et être plus productif…">'+esc(state.ob.text||'')+'</textarea></div>'
+        +'<div class="chips">'+sugg.map(x=>'<span class="chip" data-act="obsugg" data-id="'+esc(x)+'">'+esc(x)+'</span>').join('')+'</div>';
+    } else if(mode==='system'){
+      const curated=['s1','s2','s3','s4'];
+      body='<div class="ob-back-link" data-act="obmodeback">'+I.chev+' Changer de méthode</div>'
+        +'<h1>Choisis un système</h1>'
+        +'<div class="lede">Objectifs et habitudes déjà prêts. Tu pourras tout ajuster.</div>'
+        + curated.map(sid=>{ const sy=DB.systems.find(x=>x.id===sid); return obOpt(sid,sy.name,sy.desc,state.ob.system===sid); }).join('');
+    }
+  }
+  else if(s===4){
+    const usingAi = !!state.ob.aiBlocks;
+    const usingSystem = state.ob.system && state.ob.system!=='scratch' && !usingAi;
+    const sys = usingSystem ? DB.systems.find(x=>x.id===state.ob.system) : null;
+    const previewBlocks = usingAi ? state.ob.aiBlocks : (sys ? tplToBlocks(sys.tpl) : null);
+
+    if(previewBlocks && previewBlocks.length){
+      body='<h1>Ton système est prêt</h1>'
+        +'<div class="lede">Vérifie, puis démarre — tu pourras tout modifier ensuite.</div>'
+        +'<div class="chips" style="margin-bottom:14px">'+state.ob.domains.map(d=>'<span class="chip dom on">'+d+'</span>').join('')+'</div>'
+        + (usingAi && !state.ob.aiMatched ? '<div class="hint" style="margin-bottom:14px">Je n\u2019ai pas identifié d\u2019intention précise dans ta phrase — voici un point de départ simple à ajuster.</div>' : '')
+        + proposalCards(previewBlocks);
+    } else {
+      body='<h1>Tout est prêt</h1>'
+        +'<div class="lede">Tu démarres d\u2019une page blanche. Construis ton premier objectif dès ton arrivée.</div>'
+        +'<div class="card tick"><div class="eyebrow">Récapitulatif</div>'
+        +'<div class="lrow"><div class="lb"><div class="n">Cycle</div></div><div class="val mono" style="color:var(--or)">'+state.ob.cycle+' jours</div></div>'
+        +'<div class="lrow"><div class="lb"><div class="n">Domaines</div></div><div class="val mono">'+state.ob.domains.length+'</div></div></div>'
+        +'<div class="chips" style="margin-top:14px">'+state.ob.domains.map(d=>'<span class="chip dom on">'+d+'</span>').join('')+'</div>';
+    }
+  }
+
+  // Steps 1 & (3 in system-pick) are single-select and auto-advance on tap, so they need no "Continuer".
+  const s3ai = s===3 && state.ob.mode==='ai';
+  const cta = s===4 ? '<button class="btn btn-primary" data-act="obfinish">'+((state.ob.aiBlocks||(state.ob.system&&state.ob.system!=='scratch'))?'Créer et démarrer mon cycle':'Démarrer mon cycle')+'</button>'
+    : s===2 ? '<button class="btn '+(canNext?'btn-primary':'btn-ghost')+'" data-act="obnext" '+(canNext?'':'disabled style="opacity:.45;pointer-events:none"')+'>Continuer</button>'
+    : s3ai ? '<button class="btn btn-primary" data-act="obpropose">'+I.spark+'Proposer mon système</button>'
+    : '<div class="ob-tip">Touche une option pour continuer</div>';
+  foot='<div class="ob-foot">'+cta
+    + (s>1?'<button class="btn ob-back" data-act="obback">Retour</button>':'')
+    + '</div>';
+
+  return '<div class="ob"><div class="ob-top">'+bars+'</div><div class="ob-body">'+body+'</div>'+foot+'</div>';
+}
+function obModeOpt(id,t,sub,rec){
+  return '<div class="opt" data-act="obmode" data-id="'+id+'">'
+    +'<div class="obadge">'+(id==='ai'?I.spark:id==='system'?I.layers:'∅')+'</div>'
+    +'<div><div class="ob-t">'+esc(t)+'</div><div class="ob-s">'+esc(sub)+'</div></div>'
+    +(rec?'<span class="rec">Recommandé</span>':'')+'</div>';
+}
+function obIntro(){
+  return '<div class="ob"><div class="elyos-mark"><div class="ring"></div><div class="nm">ELYOS</div>'
+    +'<div class="tg">Construis-toi · jour après jour</div></div>'
+    +'<div style="flex:1"></div>'
+    +'<div class="ob-foot"><div class="note" style="text-align:center;margin-bottom:18px;padding:0 10px">Le temps passe pendant que tu te construis. Elyos t\u2019aide à exécuter — 1 à 3 minutes par jour.</div>'
+    +'<button class="btn btn-primary" data-act="obnext">Commencer</button>'
+    +'<button class="btn" style="background:none;color:var(--argent);margin-top:6px;font-size:13px;font-weight:500" data-act="obskip">Voir le proto directement</button></div></div>';
+}
+function obOpt(id,t,sub,on,rec){
+  return '<div class="opt '+(on?'on':'')+'" data-act="obselect" data-id="'+id+'">'
+    +'<div class="obadge">'+(/^\d/.test(id)?id.replace('j',''):(id==='scratch'?'∅':id.toUpperCase().replace('S','#')))+'</div>'
+    +'<div><div class="ob-t">'+esc(t)+'</div><div class="ob-s">'+esc(sub)+'</div></div>'
+    +(rec?'<span class="rec">Recommandé</span>':'')+'</div>';
+}
+
+/* ============================================================
+   SHEETS (bottom modals — quick actions & co.)
+   ============================================================ */
+function openSheet(id){
+  const sh=$('#sheet'); sh.innerHTML=sheetContent(id);
+  $('#scrim').classList.add('on'); sh.classList.add('on');
+}
+function closeSheet(){ $('#scrim').classList.remove('on'); $('#sheet').classList.remove('on'); render(); }
+function shFrame(title,body){
+  return '<div class="grab"></div><div class="sh-head"><div class="h2">'+esc(title)+'</div>'
+    +'<button class="sh-close" data-act="close-sheet">'+I.x+'</button></div><div class="sh-body">'+body+'</div>';
+}
+function sheetContent(id){
+  if(id.startsWith('sr-')){ const r=DB.routines.find(x=>x.id===id.slice(3)); return routineSheet(r); }
+  if(id==='sr') return shFrame('Valider une routine',
+    DB.routines.map(r=>{const p=routineProgress(r);return '<div class="action" data-act="opensheet" data-id="sr-'+r.id+'"><div class="check">'+(p.pct===100?I.check:'')+'</div><div class="body"><div class="t">'+esc(r.name)+'</div><div class="meta">'+p.done+'/'+p.tot+' étapes</div></div><span class="chev">'+I.chev+'</span></div>';}).join(''));
+  if(id.startsWith('ci-')||id==='sc'){
+    const o = id.startsWith('ci-')?DB.objectives.find(x=>x.id===id.slice(3)):DB.objectives.find(x=>x.type==='mesurable');
+    return shFrame('Check-in objectif',
+      '<div class="note" style="margin-bottom:16px">'+esc(o.name)+'</div>'
+      +'<div class="field"><label>Nouvelle valeur ('+(o.unit||'%')+')</label><input type="number" inputmode="decimal" id="ciVal" value="'+(o.current||o.progress)+'"></div>'
+      +'<button class="btn btn-primary" data-act="docheckin" data-id="'+o.id+'">Enregistrer le check-in</button>'
+      +'<div class="note" style="margin-top:14px;text-align:center">Le check-in met à jour la <b style="color:var(--blanc)">progression réelle</b> — pas l\u2019alignement.</div>');
+  }
+  if(id==='lib'){
+    const groups={}; DB.sport.library.forEach(x=>{(groups[x.grp]=groups[x.grp]||[]).push(x);});
+    let L='<div class="field" style="margin-bottom:4px"><input id="exSearch" placeholder="Rechercher un exercice…" data-act="exsearch" autocomplete="off"></div><div class="liblist">';
+    for(const g in groups){ L+='<div class="libgrp">'+g+'</div>';
+      groups[g].forEach(x=>{ L+='<div class="libitem" data-act="libadd" data-id="'+x.id+'" data-name="'+esc(x.nm.toLowerCase())+'"><div class="libfig">'+muscleSVG(x.grp,26)+'</div><div class="t">'+esc(x.nm)+'</div><span class="chev">'+I.plus+'</span></div>'; }); }
+    L+='</div>';
+    return shFrame('Ajouter un exercice', L);
+  }
+  if(id==='sn') return shFrame('Ajouter un repas',
+    '<button class="btn btn-primary" data-act="opensub" data-id="nutrition">Ouvrir le journal nutrition</button>'
+    +'<div class="note" style="margin-top:14px;text-align:center">Petit-déj · déjeuner · dîner · snack</div>');
+  if(id==='sa'){
+    const ad=DB.addiction;
+    return shFrame('Noter une rechute',
+      '<div class="note" style="margin-bottom:16px">Sans jugement. Identifier le déclencheur, c\u2019est déjà avancer.</div>'
+      +(ad.clean>0?'<div class="card"><div class="eyebrow" style="margin-bottom:6px">Ce que tu gardes</div>'
+        +'<div class="note">Tes <b style="color:var(--or)">'+ad.clean+' jours</b> tenus ne disparaissent pas : ton record reste à <b style="color:var(--blanc)">'+Math.max(ad.best,ad.clean)+' jours</b>. Une rechute remet le compteur à zéro, pas ta progression.</div></div>':'')
+      +'<div class="field"><label>Déclencheur</label><div class="chips">'+ad.triggers.concat(['Autre']).map(t=>'<span class="chip">'+esc(t)+'</span>').join('')+'</div></div>'
+      +'<button class="btn btn-ghost" data-act="dorelapse">Enregistrer et repartir</button>'
+      +'<button class="btn btn-line" style="margin-top:10px" data-act="close-sheet">J\u2019ai tenu finalement</button>');
+  }
+  if(id==='snote') return shFrame('Note rapide',
+    '<div class="field"><textarea rows="4" placeholder="Une pensée, un ressenti, un déclic..."></textarea></div>'
+    +'<button class="btn btn-primary" data-act="savenote">Enregistrer la note</button>');
+  if(id==='newcycle'){
+    const opts=DB.systems.slice(0,5);
+    return shFrame('Nouveau cycle',
+      '<div class="note" style="margin-bottom:16px">Démarrer un nouveau cycle archive le cycle actuel, puis installe le système choisi.</div>'
+      + opts.map(sy=>'<div class="action" data-act="startcycle" data-id="'+sy.id+'"><div class="body"><div class="t">'+esc(sy.name)+'</div><div class="meta">'+sy.obj+' objectifs · '+sy.act+' actions</div></div><span class="chev">'+I.chev+'</span></div>').join('')
+      + '<div class="action" data-act="startcycle" data-id="scratch"><div class="body"><div class="t">Partir de zéro</div><div class="meta">Je construis tout moi-même</div></div><span class="chev">'+I.chev+'</span></div>');
+  }
+  if(id==='srnew'){
+    return shFrame('Nouvelle routine',
+      '<div class="field"><label>Nom de la routine</label><input id="rnName" placeholder="Routine matin, Routine étudiant…" autocomplete="off"></div>'
+      +'<div class="field"><label>Étapes (une par ligne)</label><textarea id="rnSteps" rows="5" placeholder="Réveil 7h\nGrand verre d\u2019eau\n3 priorités du jour"></textarea></div>'
+      +'<button class="btn btn-primary" data-act="rnsave">Créer la routine</button>'
+      +'<div class="note" style="margin-top:14px;text-align:center">Une routine est une checklist qui se réinitialise chaque jour.</div>');
+  }
+  if(id.startsWith('prev-')){
+    const sys=[...DB.systems,...DB.publicSystems].find(x=>x.id===id.slice(5));
+    if(!sys) return shFrame('Aperçu','<div class="note">Système introuvable.</div>');
+    const canCopy = !sys.author || sys.copyable;
+    return shFrame(sys.name,
+      '<div class="note" style="margin-bottom:14px">'+esc(sys.desc)+'</div>'
+      + (sys.tpl ? proposalCards(tplToBlocks(sys.tpl))
+          + (sys.tpl.routine?'<div class="card"><div class="eyebrow" style="margin-bottom:8px">Routine incluse</div><div class="h2" style="font-size:15px">'+esc(sys.tpl.routine.name)+'</div><div class="note" style="margin-top:6px">'+sys.tpl.routine.steps.length+' étapes</div></div>':'')
+        : '<div class="note">Contenu non détaillé.</div>')
+      + (canCopy?'<button class="btn btn-primary" style="margin-top:6px" data-act="copysys" data-id="'+sys.id+'">'+I.copy+'Copier ce système</button>'
+                :'<div class="note" style="text-align:center;margin-top:10px">Système en vitrine — inspire-toi, mais il n\u2019est pas copiable.</div>'));
+  }
+  if(id==='endday'){
+    const score=dayAlignment(), st=alignStreak();
+    const acts=DB.actions.filter(a=>a.today!==false);
+    const done=acts.filter(a=>actionDone(a)), missed=acts.filter(a=>!actionDone(a));
+    const isWeekEnd=(DB.alignHistory.length+1)%7===0;
+    let msg;
+    if(score>=90) msg='Journée impeccable. C\u2019est exactement ça, vivre selon ton système.';
+    else if(score>=ALIGN_OK) msg='Journée alignée. Tu fais le travail — le résultat suivra.';
+    else if(score>=40) msg='Journée partielle. Ce qui compte, c\u2019est de recommencer demain.';
+    else msg='Journée difficile. Une journée ratée ne casse rien — l\u2019abandon, si.';
+    return shFrame('Clôturer la journée',
+      '<div class="endday-score"><div class="eds-v">'+score+'<sup>%</sup></div><div class="eds-l">Alignement du jour '+DB.cycle.day+'</div></div>'
+      +'<div class="hint" style="margin:14px 0 16px">'+msg+'</div>'
+      +(done.length?'<div class="card"><div class="eyebrow" style="margin-bottom:8px">Réalisé ('+done.length+')</div>'+done.map(a=>'<div class="lrow" style="padding:8px 0"><div class="lb"><div class="n" style="font-size:13px">✅ '+esc(a.title)+'</div></div></div>').join('')+'</div>':'')
+      +(missed.length?'<div class="card"><div class="eyebrow" style="margin-bottom:8px">Non fait ('+missed.length+')</div>'+missed.map(a=>'<div class="lrow" style="padding:8px 0"><div class="lb"><div class="n" style="font-size:13px;color:var(--argent-2)">— '+esc(a.title)+'</div></div></div>').join('')+'</div>':'')
+      +(st.todayCounts?'<div class="note" style="text-align:center;margin:12px 0">Série en cours : <b style="color:var(--or)">'+st.n+' jour'+(st.n>1?'s':'')+'</b></div>':'')
+      +'<button class="btn btn-primary" style="margin-top:6px" data-act="doendday" data-id="'+(isWeekEnd?'week':'day')+'">Valider et passer au jour '+(DB.cycle.day+1)+'</button>'
+      +'<div class="note" style="margin-top:12px;text-align:center">Tes habitudes se remettent à zéro pour demain.</div>');
+  }
+  if(id==='weekreview'){
+    const wk=DB.alignHistory.slice(-7);
+    const moy=avg(wk), prev=avg(DB.alignHistory.slice(-14,-7));
+    const delta=prev?moy-prev:null;
+    const sorted=[...DB.habitStats].sort((a,b)=>b.pct-a.pct);
+    const best=sorted.slice(0,2), worst=[...sorted].reverse().slice(0,2);
+    return shFrame('Ta semaine',
+      '<div class="endday-score"><div class="eds-v">'+moy+'<sup>%</sup></div><div class="eds-l">Alignement moyen'+(delta!==null?' · <span class="'+(delta>=0?'up':'down')+'">'+(delta>=0?'+':'')+delta+' pts</span>':'')+'</div></div>'
+      +'<div class="card" style="margin-top:16px"><div class="eyebrow" style="margin-bottom:12px">Tes 7 jours</div><div class="barchart">'
+      + wk.map((v,i)=>'<div class="bcol"><div class="bfill'+(v>=ALIGN_OK?' now':'')+'" style="height:'+Math.max(4,v)+'%"></div><span class="bday">'+['L','M','M','J','V','S','D'][i%7]+'</span></div>').join('')
+      +'</div></div>'
+      +(best.length?'<div class="card"><div class="eyebrow" style="margin-bottom:8px">Tes points forts</div>'+best.map(h=>'<div class="lrow" style="padding:8px 0"><div class="lb"><div class="n" style="font-size:13px">✅ '+esc(h.k)+'</div></div><div class="val mono up" style="font-size:13px">'+h.pct+'%</div></div>').join('')+'</div>':'')
+      +(worst.length?'<div class="card"><div class="eyebrow" style="margin-bottom:8px">À reprendre</div>'+worst.map(h=>'<div class="lrow" style="padding:8px 0"><div class="lb"><div class="n" style="font-size:13px">❌ '+esc(h.k)+'</div></div><div class="val mono down" style="font-size:13px">'+h.pct+'%</div></div>').join('')+'</div>':'')
+      +'<button class="btn btn-primary" style="margin-top:6px" data-act="close-sheet">Continuer</button>');
+  }
+  if(id==='cycleend'){
+    const al=cycleAlignment()||0;
+    const sorted=[...DB.habitStats].sort((a,b)=>b.pct-a.pct);
+    const objDone=DB.objectives.filter(o=>objProg(o)>=100).length;
+    const objProgAvg=DB.objectives.length?Math.round(DB.objectives.reduce((n,o)=>n+objProg(o),0)/DB.objectives.length):0;
+    return shFrame('Fin de cycle',
+      '<div class="cyc-hero"><div class="ch-k">'+esc(DB.cycle.name)+'</div>'
+      +'<div class="ch-v">'+al+'<sup>%</sup></div><div class="ch-l">d\u2019alignement sur '+DB.cycle.day+' jours</div></div>'
+      +'<div class="hint" style="margin:16px 0">Ce n\u2019est pas qu\u2019un score : c\u2019est '+DB.cycle.day+' jours où tu as choisi de faire le travail. Voilà ce que tu as construit.</div>'
+      +'<div class="stats"><div class="stat"><div class="k">Objectifs atteints</div><div class="v">'+objDone+'<small>/'+DB.objectives.length+'</small></div></div>'
+      +'<div class="stat"><div class="k">Progression moyenne</div><div class="v">'+objProgAvg+'<small>%</small></div></div>'
+      +'<div class="stat"><div class="k">Meilleure série</div><div class="v">'+bestStreak()+'<small> j</small></div></div>'
+      +'<div class="stat"><div class="k">Habitudes suivies</div><div class="v">'+DB.habitStats.length+'</div></div></div>'
+      +(sorted.length?'<div class="card" style="margin-top:12px"><div class="eyebrow" style="margin-bottom:8px">Ce que tu as le mieux tenu</div>'+sorted.slice(0,3).map(h=>'<div class="lrow" style="padding:8px 0"><div class="lb"><div class="n" style="font-size:13px">'+esc(h.k)+'</div></div><div class="val mono" style="color:var(--or);font-size:13px">'+h.pct+'%</div></div>').join('')+'</div>':'')
+      +'<button class="btn btn-primary" style="margin-top:14px" data-act="cycledup">'+I.copy+'Refaire ce cycle (comparer)</button>'
+      +'<button class="btn btn-ghost" style="margin-top:10px" data-act="sheet" data-id="newcycle">'+I.plus+'Démarrer un nouveau cycle</button>');
+  }
+  if(id==='adddomain'){
+    const avail=DOMAINS.filter(d=>!DB.domains.includes(d));
+    return shFrame('Domaines actifs',
+      '<div class="note" style="margin-bottom:14px">Ajoute ou retire un domaine de ton cycle. Les domaines guident tes objectifs et pondèrent ton alignement.</div>'
+      +'<div class="field"><label>Actifs ('+DB.domains.length+')</label><div class="chips">'+DB.domains.map(d=>'<span class="chip dom on" data-act="domtoggle" data-id="'+d+'">'+d+' ✕</span>').join('')+'</div></div>'
+      +(avail.length?'<div class="field"><label>Disponibles</label><div class="chips">'+avail.map(d=>'<span class="chip dom" data-act="domtoggle" data-id="'+d+'">+ '+d+'</span>').join('')+'</div></div>':'<div class="note">Tous les domaines sont actifs.</div>')
+      +'<button class="btn btn-primary" style="margin-top:6px" data-act="close-sheet">Terminé</button>');
+  }
+  if(id==='lifeadd'){
+    const avail=LIFE_LIB.filter(l=>!DB.lifestyle.some(x=>x.k===l.k));
+    return shFrame('Suivre un indicateur',
+      '<div class="note" style="margin-bottom:14px">Choisis ce que tu veux suivre. Rien n\u2019est imposé.</div>'
+      +(avail.length?avail.map(l=>'<div class="action" data-act="lifeaddone" data-id="'+esc(l.k)+'"><div class="ic" style="width:34px;height:34px;border-radius:9px;background:var(--surface-2);display:grid;place-items:center;margin-right:12px">'+I[l.ic]+'</div><div class="body"><div class="t">'+esc(l.k)+'</div></div><span class="chev">'+I.plus+'</span></div>').join('')
+        :'<div class="note">Tu suis déjà tous les indicateurs disponibles.</div>')
+      +(DB.lifestyle.length?'<div class="section-head" style="margin-top:14px"><div class="h2">Suivis</div></div>'+DB.lifestyle.map(l=>'<div class="actrow"><div class="ab"><div class="t">'+esc(l.k)+'</div></div><button class="actdel" data-act="liferemove" data-id="'+esc(l.k)+'">'+I.x+'</button></div>').join(''):'')
+      +'<button class="btn btn-primary" style="margin-top:14px" data-act="close-sheet">Terminé</button>');
+  }
+  if(id==='objpriority'){
+    return shFrame('Mettre en avant tes objectifs',
+      '<div class="note" style="margin-bottom:14px">L\u2019ordre choisit ce qui apparaît en premier sur ton dashboard.</div>'
+      + '<div class="prilist">'+DB.priorities.map((oid,i)=>{ const o=DB.objectives.find(x=>x.id===oid); if(!o) return ''; return '<div class="prirow"><div class="prio">'+(i+1)+'</div><div class="ic">'+(DOM_IC[o.dom]?I[DOM_IC[o.dom]]:I.layers)+'</div><div class="lb"><div class="n">'+esc(o.name)+'</div></div>'
+        +'<div class="primv"><button data-act="objpriomove" data-id="'+oid+'" data-dir="up" '+(i===0?'disabled':'')+'>'+I.chev+'</button><button data-act="objpriomove" data-id="'+oid+'" data-dir="down" '+(i===DB.priorities.length-1?'disabled':'')+'>'+I.chev+'</button></div></div>'; }).join('')+'</div>'
+      + '<button class="btn btn-primary" style="margin-top:16px" data-act="close-sheet">Terminé</button>');
+  }
+  if(id==='domains'){
+    return shFrame('Priorité des domaines',
+      '<div class="note" style="margin-bottom:14px">L\u2019ordre = ta priorité. Les domaines en haut pèsent davantage dans ton alignement.</div>'
+      + '<div class="prilist">'+DB.domains.map((d,i)=>'<div class="prirow"><div class="prio">'+(i+1)+'</div><div class="ic">'+(DOM_IC[d]?I[DOM_IC[d]]:I.layers)+'</div><div class="lb"><div class="n">'+esc(d)+'</div></div>'
+        +'<div class="primv"><button data-act="dommove" data-id="'+d+'" data-dir="up" '+(i===0?'disabled':'')+'>'+I.chev+'</button><button data-act="dommove" data-id="'+d+'" data-dir="down" '+(i===DB.domains.length-1?'disabled':'')+'>'+I.chev+'</button></div></div>').join('')+'</div>'
+      + '<button class="btn btn-primary" style="margin-top:16px" data-act="close-sheet">Terminé</button>');
+  }
+  if(id==='confirmdel'){
+    const a=DB.actions.find(x=>x.id===pendingDel);
+    return shFrame('Supprimer cette habitude ?',
+      '<div class="card" style="text-align:center"><div class="h2" style="font-size:16px">'+esc(a?a.title:'')+'</div>'
+      +'<div class="note" style="margin-top:8px">Elle disparaîtra de ta journée et de ton système. Cette action est définitive.</div></div>'
+      +'<button class="btn btn-danger" style="margin-top:6px" data-act="doactdel">Supprimer</button>'
+      +'<button class="btn btn-ghost" style="margin-top:10px" data-act="close-sheet">Annuler</button>');
+  }
+  if(id==='act'){
+    const t=tmpAct||{title:'',freq:'daily',objIds:[]};
+    const sel=t.objIds||[];
+    const freqs=[['daily','Tous les jours'],['3x','3×/semaine'],['5x','5×/semaine'],['custom','Personnalisé']];
+    const objChips=DB.objectives.length
+      ? DB.objectives.map(o=>'<span class="chip '+(sel.includes(o.id)?'on':'')+'" data-act="actobj" data-id="'+o.id+'">'+esc(o.name)+'</span>').join('')
+      : '<div class="note">Aucun objectif pour l\u2019instant.</div>';
+    return shFrame(t.id?'Modifier l\u2019habitude':'Nouvelle habitude',
+      '<div class="field"><label>Intitulé</label><input id="actTitle" placeholder="Ex. 15 min de cardio, 2 L d\u2019eau…" value="'+esc(t.title||'')+'" autocomplete="off"></div>'
+      +'<div class="field"><label>Fréquence</label><div class="chips">'+freqs.map(f=>'<span class="chip '+(t.freq===f[0]?'on':'')+'" data-act="actfreq" data-id="'+f[0]+'">'+f[1]+'</span>').join('')+'</div></div>'
+      +'<div class="field opt-field"><label>Contribue à un objectif <span class="opt-tag">facultatif</span></label><div class="chips">'+objChips+'</div>'
+      +'<div class="note" style="margin-top:8px">'+(sel.length?'Cocher cette habitude fera monter l\u2019alignement de '+sel.length+' objectif'+(sel.length>1?'s':'')+'.':'Sans objectif, elle compte quand même dans ton alignement du jour.')+'</div></div>'
+      +'<button class="btn btn-primary" data-act="actsave">'+(t.id?'Enregistrer':'Ajouter l\u2019habitude')+'</button>'
+      +(t.id?'<button class="btn btn-line" style="margin-top:10px" data-act="actdelete" data-id="'+t.id+'">Supprimer l\u2019habitude</button>'
+            +'<div class="sys-link" data-act="gosystem">Voir dans mon système</div>':''));
+  }
+  if(id==='obj'){
+    const t=tmpObj||{type:'mesurable'};
+    const types=[['mesurable','Mesurable'],['quantitatif','Quantitatif'],['etapes','Par étapes'],['streak','Streak'],['manuel','Manuel']];
+    const needTarget=(t.type!=='etapes'&&t.type!=='manuel');
+    return shFrame('Nouvel objectif',
+      '<div class="field"><label>Domaine</label><div class="chips">'+DOMAINS.map(d=>'<span class="chip '+(t.dom===d?'on':'')+'" data-act="objdom" data-id="'+d+'">'+d+'</span>').join('')+'</div></div>'
+      +'<div class="field"><label>Nom de l\u2019objectif</label><input id="objName" data-act="objnameinput" placeholder="Ex. Perdre 5 kg, Lire 10 livres…" value="'+esc(t.name||'')+'" autocomplete="off"></div>'
+      +'<div class="field"><label>Type'+(t.typeManual?'':' <span id="objTypeHint" class="type-hint">· suggéré</span>')+'</label><div class="chips" id="objTypeChips">'+types.map(x=>'<span class="chip '+(t.type===x[0]?'on':'')+'" data-act="objtype" data-id="'+x[0]+'">'+x[1]+'</span>').join('')+'</div></div>'
+      +'<div id="objTargetWrap" style="display:'+(needTarget?'flex':'none')+';gap:10px" class="field"><div style="flex:1"><label>Valeur cible</label><input id="objTarget" type="number" inputmode="decimal" placeholder="'+(t.type==='streak'?'30':'10')+'" value="'+(t.target||'')+'"></div><div style="flex:1"><label>Unité</label><input id="objUnit" placeholder="'+(t.type==='streak'?'jours':(t.type==='tracker'?'km, pages…':'kg, livres…'))+'" value="'+esc(t.unit||'')+'" autocomplete="off"></div></div>'
+      +'<div id="objTypeNote" class="note" style="margin:2px 0 14px;display:'+(needTarget?'none':'block')+'">'+(t.type==='manuel'?'Tu estimeras l\u2019avancement avec un curseur.':'Tu ajouteras les étapes ensuite, dans l\u2019objectif.')+'</div>'
+      +'<div class="field"><label>Date cible (optionnel)</label><input id="objDate" placeholder="Ex. 30 sept." value="'+esc(t.date||'')+'" autocomplete="off"></div>'
+      +'<button class="btn btn-primary" data-act="objsave">Créer l\u2019objectif</button>'
+      +'<div class="note" style="margin-top:14px;text-align:center">Tu pourras lui lier des actions juste après.</div>');
+  }
+  if(id.startsWith('step-')){
+    return shFrame('Ajouter une étape',
+      '<div class="field"><label>Intitulé de l\u2019étape</label><input id="stepTitle" placeholder="Ex. Bêta fermée" autocomplete="off"></div>'
+      +'<button class="btn btn-primary" data-act="stepsave" data-id="'+id.slice(5)+'">Ajouter l\u2019étape</button>');
+  }
+  return shFrame('Action',''+id);
+}
+function routineSheet(r){
+  const p=routineProgress(r);
+  return shFrame(r.name,
+    '<div class="kicker" style="margin-bottom:14px"><span class="dot"></span>'+esc(r.days)+(r.timed?' · horaire':'')+' · '+p.done+'/'+p.tot+' ('+p.pct+'%)</div>'
+    + r.steps.map((s,i)=>'<div class="rstep '+(s.done?'done':'')+'" data-act="rstep" data-id="'+r.id+'" data-i="'+i+'">'
+      +(r.timed?'<div class="tm">'+esc(s.tm)+'</div>':'')
+      +'<div class="rdot">'+I.check+'</div><div class="rl">'+esc(s.t)+'</div></div>').join('')
+    + '<button class="btn btn-primary" style="margin-top:18px" data-act="close-sheet">'+(p.pct===100?'Routine terminée':'Continuer')+'</button>'
+    + '<div class="note" style="text-align:center;margin-top:12px">Reset automatique chaque jour.</div>');
+}
+/* ============================================================
+   ROUTER / RENDER
+   ============================================================ */
+function render(){
+  if(!state.onboarded){ app().innerHTML=screenOnboarding(); return; }
+  if(state.sub){
+    const m={sport:subSport,nutrition:subNutrition,addiction:subAddiction,lifestyle:subLifestyle,assistant:subAssistant};
+    const inSession = state.sub.kind==='sport' && state.sub.view==='session' && !!DB.sport.active;
+    let sc='';
+    if(state.sub.kind==='objective') sc=subObjective(state.sub.id);
+    else sc=(m[state.sub.kind]||(()=>'<div class="view"></div>'))();
+    app().innerHTML = sc + (inSession?'':nav());
+    ensureSportTimer(inSession);
+    return;
+  }
+  ensureSportTimer(false);
+  let content='';
+  switch(state.screen){
+    case 'dashboard': content=topbar('','',{wordmark:true})+screenDashboard(); break;
+    case 'progression': content=topbar('Analyse','Progression')+screenProgression(); break;
+    case 'systeme': content=screenSysteme(); break;
+    case 'bibliotheque': content=screenBibliotheque(); break;
+    case 'academie': content=screenAcademie(); break;
+    case 'profile': content=screenProfile(); break;
+  }
+  app().innerHTML=content+nav();
+}
+
+/* ============================================================
+   EVENT DELEGATION
+   ============================================================ */
+function findAct(e){ let el=e.target; while(el && el!==document){ if(el.dataset && el.dataset.act) return el; el=el.parentNode; } return null; }
+
+document.addEventListener('click',e=>{
+  if(swMoved){ swMoved=false; return; }   // c'était un swipe, pas un tap
+  const el=findAct(e);
+  const openRow=document.querySelector('.swipe-wrap.open');
+  if(openRow){
+    const insideOpen = el && el.closest && el.closest('.swipe-wrap.open');
+    if(!insideOpen){ closeSwipes(); if(!el) return; }
+  }
+  if(!el) return;
+  const act=el.dataset.act, id=el.dataset.id;
+  switch(act){
+    case 'go': state.sub=null; state.screen=el.dataset.screen; render(); break;
+    case 'back': state.sub=null; render(); break;
+    case 'sub': state.sub={kind:id}; render(); break;
+    case 'objective': state.sub={kind:'objective',id}; render(); break;
+    case 'opensub': closeSheet(); state.sub={kind:id}; render(); break;
+    case 'openassistant': closeSheet(); asst={proposal:null,last:''}; state.sub={kind:'assistant'}; render(); break;
+    case 'asstsugg': { asst.last=id; const r=assistantEngine(id); asst.proposal=r.blocks; asst.matched=r.matched; render(); break; }
+    case 'asstsend': { const ti=$('#asstInput'); asst.last=ti?ti.value:''; const r=assistantEngine(asst.last); asst.proposal=r.blocks; asst.matched=r.matched; render(); break; }
+    case 'asstreset': { asst={proposal:null,last:''}; render(); break; }
+    case 'asstcreate': {
+      if(!asst.proposal) break;
+      const firstId=instantiateBlocks(asst.proposal);
+      asst={proposal:null,last:''}; state.sub={kind:'objective',id:firstId}; render(); toast('Système créé · objectifs et habitudes ajoutés'); break;
+    }
+
+    case 'toggle': case 'action': {
+      const aid = id || el.dataset.id;
+      const a=DB.actions.find(x=>x.id===aid);
+      if(!a) break;
+      if(a.type==='routine'){ openSheet('sr-'+a.ref); break; }
+      if(a.type==='workout'){ state.sub={kind:'sport',view:DB.sport.active?'session':'home'}; render(); break; }
+      if(a.type==='nutrition'){ state.sub={kind:'nutrition'}; render(); break; }
+      if(a.type==='addiction'){
+        a.done=!a.done; const delta=a.done?1:-1;
+        DB.addiction.clean=Math.max(0,DB.addiction.clean+delta);
+        if(DB.addiction.clean>DB.addiction.best) DB.addiction.best=DB.addiction.clean;
+        actObjIds(a).forEach(oid=>{ const o=DB.objectives.find(x=>x.id===oid); if(o&&o.type==='streak'){ o.current=clamp(o.current+delta,0,o.target); recomputeProg(o); } });
+        toast(a.done?'Journée sans rechute validée · '+DB.addiction.clean+' jours':'Action annulée'); render(); break;
+      }
+      a.done=!a.done; render();
+      break;
+    }
+    case 'progtab': progTab=id; render(); break;
+    case 'systab': sysTab=id; render(); break;
+    case 'dommove': { const d=DB.domains, i=d.indexOf(id), dir=el.dataset.dir; const j=dir==='up'?i-1:i+1; if(i>=0&&j>=0&&j<d.length){ const tmp=d[i]; d[i]=d[j]; d[j]=tmp; } $('#sheet').innerHTML=sheetContent('domains'); break; }
+    case 'objpriomove': { const p=DB.priorities, i=p.indexOf(id), dir=el.dataset.dir; const j=dir==='up'?i-1:i+1; if(i>=0&&j>=0&&j<p.length){ const tmp=p[i]; p[i]=p[j]; p[j]=tmp; } $('#sheet').innerHTML=sheetContent('objpriority'); break; }
+    case 'doendday': {
+      const score=advanceDay();
+      closeSheet();
+      if(DB.cycle.day>=DB.cycle.total){ render(); openSheet('cycleend'); break; }
+      if(id==='week'){ render(); openSheet('weekreview'); break; }
+      render(); toast('Jour '+DB.cycle.day+' · alignement d\u2019hier enregistré à '+score+'%'); break;
+    }
+    case 'startcycle': {
+      const al=cycleAlignment();
+      DB.cycleHistory.unshift({id:'h'+(++seq),year:2026,name:DB.cycle.name,score:al==null?0:al,days:DB.cycle.day,domains:[...DB.domains].slice(0,4)});
+      DB.objectives.length=0; DB.priorities.length=0; DB.actions.length=0; DB.routines.length=0;
+      DB.alignHistory.length=0; DB.habitStats.length=0;
+      DB.cycle.day=1;
+      if(id!=='scratch'){ const sys=DB.systems.find(x=>x.id===id); if(sys){ DB.cycle.name=sys.name; instantiateSystem(sys); } }
+      else DB.cycle.name='Cycle personnalisé';
+      closeSheet(); state.screen='dashboard'; state.sub=null; render();
+      toast(id==='scratch'?'Nouveau cycle lancé. Construis ton système.':'Nouveau cycle lancé · système installé'); break;
+    }
+    case 'domtoggle': {
+      const i=DB.domains.indexOf(id);
+      if(i>=0){
+        const used=DB.objectives.some(o=>o.dom===id);
+        if(used){ toast('Ce domaine porte des objectifs — retire-les d\u2019abord.'); break; }
+        if(DB.domains.length<=1){ toast('Garde au moins un domaine actif.'); break; }
+        DB.domains.splice(i,1);
+      } else DB.domains.push(id);
+      $('#sheet').innerHTML=sheetContent('adddomain'); break;
+    }
+    case 'lifeaddone': { const l=LIFE_LIB.find(x=>x.k===id); if(l&&!DB.lifestyle.some(x=>x.k===l.k)) DB.lifestyle.push({k:l.k,v:'—',ic:l.ic,pct:0}); $('#sheet').innerHTML=sheetContent('lifeadd'); break; }
+    case 'liferemove': { const i=DB.lifestyle.findIndex(x=>x.k===id); if(i>=0)DB.lifestyle.splice(i,1); $('#sheet').innerHTML=sheetContent('lifeadd'); break; }
+    case 'libtab': libTab=id; render(); break;
+
+    case 'sheet': openSheet(id); break;
+    case 'opensheet': openSheet(id); break;
+    case 'close-sheet': closeSheet(); break;
+
+    case 'rstep': { const r=DB.routines.find(x=>x.id===id); r.steps[+el.dataset.i].done=!r.steps[+el.dataset.i].done; $('#sheet').innerHTML=routineSheet(r); break; }
+    case 'objstep': { const o=DB.objectives.find(x=>x.id===id); const st=o.steps[+el.dataset.i]; st.done=!st.done; recomputeProg(o); render(); toast('Étape mise à jour · progression '+objProg(o)+'%'); break; }
+    case 'addstep': { tmpObj=null; openSheet('step-'+id); break; }
+    case 'stepsave': { const o=DB.objectives.find(x=>x.id===id); const t=($('#stepTitle').value||'').trim(); if(t){ o.steps.push({t,done:false}); recomputeProg(o);} closeSheet(); render(); break; }
+    case 'delstep': { const o=DB.objectives.find(x=>x.id===id); o.steps.splice(+el.dataset.i,1); recomputeProg(o); render(); break; }
+    case 'qtyplus': { const o=DB.objectives.find(x=>x.id===id); o.current=Math.min(o.target,o.current+1); recomputeProg(o); render(); toast('Progression · '+objResult(o)); break; }
+    case 'qtyminus': { const o=DB.objectives.find(x=>x.id===id); o.current=Math.max(0,o.current-1); recomputeProg(o); render(); break; }    case 'streakplus': { const o=DB.objectives.find(x=>x.id===id); o.current=Math.min(o.target,o.current+1); recomputeProg(o); render(); toast('Bravo — '+o.current+' jours tenus'); break; }
+    case 'streakreset': { const o=DB.objectives.find(x=>x.id===id); o.current=0; recomputeProg(o); render(); toast('On repart. Sans jugement.'); break; }
+
+    case 'newhabit': { tmpAct={objIds:[],title:'',freq:'daily'}; openSheet('act'); break; }
+    case 'actmenu': { closeSwipes(); const wrap=document.querySelector('.swipe-wrap[data-swipe="'+id+'"]'); if(wrap) wrap.classList.add('open'); break; }
+    case 'actaskdel': { const a=DB.actions.find(x=>x.id===id); if(a){ pendingDel=id; openSheet('confirmdel'); } break; }
+    case 'doactdel': { const i=DB.actions.findIndex(x=>x.id===pendingDel); if(i>=0){ const nm=DB.actions[i].title; DB.actions.splice(i,1); toast('« '+nm+' » supprimée'); } pendingDel=null; closeSheet(); render(); break; }
+    case 'gosystem': { closeSheet(); state.sub=null; state.screen='systeme'; sysTab='structure'; render(); break; }
+    case 'objaddaction': { tmpAct={objIds:[id],title:'',freq:'daily'}; openSheet('act'); break; }
+    case 'actfreq': { if(tmpAct){ const ti=$('#actTitle'); if(ti)tmpAct.title=ti.value; tmpAct.freq=id; } $('#sheet').innerHTML=sheetContent('act'); break; }
+    case 'actobj': { if(tmpAct){ const ti=$('#actTitle'); if(ti)tmpAct.title=ti.value; tmpAct.objIds=tmpAct.objIds||[]; const i=tmpAct.objIds.indexOf(id); if(i<0)tmpAct.objIds.push(id); else tmpAct.objIds.splice(i,1); } $('#sheet').innerHTML=sheetContent('act'); break; }
+    case 'actedit': { const a=DB.actions.find(x=>x.id===id); if(a){ tmpAct={id:a.id,objIds:actObjIds(a).slice(),title:a.title,freq:a.freq||'daily'}; openSheet('act'); } break; }
+    case 'actsave': {
+      const title=($('#actTitle').value||'').trim(); if(!title){ toast('Donne un intitulé à l\u2019habitude'); break; }
+      if(tmpAct.id){ const a=DB.actions.find(x=>x.id===tmpAct.id); if(a){ a.title=title; a.freq=tmpAct.freq; a.objIds=(tmpAct.objIds||[]).slice(); } toast('Habitude modifiée'); }
+      else { const ids=tmpAct.objIds||[]; const o=DB.objectives.find(x=>x.id===ids[0]); const dom=o?o.dom:''; const isFirst=o&&o.type==='streak'&&o.dom==='Addictions'&&objActions(o).length===0; const na=makeAction(title,dom,ids.slice(),tmpAct.freq,isFirst); na.createdDay=DB.cycle.day;
+        DB.actions.push(na); toast(na.type!=='simple' ? 'Habitude ajoutée · liée au tracker '+({workout:'Sport',nutrition:'Nutrition',addiction:'Anti-addiction'}[na.type]) : 'Habitude ajoutée'); }
+      tmpAct=null; closeSheet(); render(); break;
+    }
+    case 'actdelete': { const i=DB.actions.findIndex(x=>x.id===id); if(i>=0)DB.actions.splice(i,1); tmpAct=null; closeSheet(); render(); toast('Habitude supprimée'); break; }
+
+    case 'newobj': { tmpObj={type:'mesurable'}; openSheet('obj'); break; }
+    case 'rnsave': { const nm=($('#rnName').value||'').trim(); const lines=($('#rnSteps').value||'').split('\n').map(x=>x.trim()).filter(Boolean); if(!nm){ toast('Donne un nom à la routine'); break; } const rid='r'+(++seq); DB.routines.push({id:rid,name:nm,sub:'Personnalisée',timed:false,days:'Tous les jours',steps:lines.map(t=>({t,tm:'',done:false}))}); DB.actions.push({id:'a'+(++seq),type:'routine',ref:rid,title:nm,dom:'Lifestyle',objIds:[],freq:'daily',today:true,done:false}); closeSheet(); render(); toast('Routine créée'); break; }
+    case 'cycledup': { const c=DB.cycle, al=cycleAlignment(); const n=DB.cycleHistory.filter(h=>h.series===c.id).length+1; DB.cycleHistory.unshift({id:'h'+(++seq),year:2026,name:c.name+' #'+n,score:al,days:c.total,domains:[...DB.domains].slice(0,4),series:c.id}); render(); toast('Cycle dupliqué — la copie repart à zéro, tu pourras comparer.'); break; }
+    case 'cyclearchive': { const c=DB.cycle, al=cycleAlignment(); DB.cycleHistory.unshift({id:'h'+(++seq),year:2026,name:c.name,score:al,days:c.day,domains:[...DB.domains].slice(0,4)}); render(); toast('Cycle archivé dans ton historique.'); break; }
+    case 'objdom': { if(tmpObj){ syncObjFields(); tmpObj.dom=id; } $('#sheet').innerHTML=sheetContent('obj'); break; }
+    case 'objtype': { if(tmpObj){ syncObjFields(); tmpObj.type=id; tmpObj.typeManual=true; } $('#sheet').innerHTML=sheetContent('obj'); break; }
+    case 'objsave': {
+      const name=($('#objName').value||'').trim(); const dom=tmpObj.dom;
+      if(!name){ toast('Donne un nom à l\u2019objectif'); break; } if(!dom){ toast('Choisis un domaine'); break; }
+      const type=tmpObj.type;
+      const oid=instantiateObjective({dom,n:name,type,
+        target:parseFloat($('#objTarget')?$('#objTarget').value:0)||(type==='streak'?30:10),
+        unit:($('#objUnit')?$('#objUnit').value.trim():'')||(type==='streak'?'jours':'')});
+      const o=DB.objectives.find(x=>x.id===oid); o.targetDate=($('#objDate')?$('#objDate').value.trim():'');
+      tmpObj=null; closeSheet(); state.sub={kind:'objective',id:oid}; render(); toast('Objectif créé. Ajoute tes actions.'); break;
+    }
+
+    case 'setdone': { const s=DB.sport.active.ex[+el.dataset.e].sets[+el.dataset.s]; s.done=!s.done; if(s.done) restEnd=Date.now()+90000; render(); break; }
+    case 'addset': { const ex=DB.sport.active.ex[+el.dataset.e]; const last=ex.sets[ex.sets.length-1]||{kg:0,reps:0}; ex.sets.push({kg:last.kg,reps:last.reps,done:false}); render(); break; }
+    case 'delexercise': { DB.sport.active.ex.splice(+el.dataset.e,1); render(); break; }
+    case 'resumesession': state.sub={kind:'sport',view:'session'}; render(); break;
+    case 'sportback': state.sub={kind:'sport'}; render(); break;
+    case 'startsession': {
+      const sp=DB.sport;
+      if(id==='empty'){ sp.active={nm:'Séance libre',sub:'Personnalisée',started:Date.now(),ex:[]}; }
+      else { const t=sp.templates.find(x=>x.id===id); sp.active={nm:t.nm,sub:t.sub,started:Date.now(),
+        ex:t.exIds.map(xi=>{const lib=sp.library.find(l=>l.id===xi)||{nm:xi}; const pv=prevSet(xi); return {id:xi,nm:lib.nm,grp:lib.grp,sets:[{kg:pv.kg,reps:pv.reps,done:false},{kg:pv.kg,reps:pv.reps,done:false}]};}) }; }
+      restEnd=null; state.sub={kind:'sport',view:'session'}; render(); break;
+    }
+    case 'openlibrary': openSheet('lib'); break;
+    case 'libadd': { const lib=DB.sport.library.find(l=>l.id===id); const pv=prevSet(id); DB.sport.active.ex.push({id:lib.id,nm:lib.nm,grp:lib.grp,sets:[{kg:pv.kg,reps:pv.reps,done:false}]}); closeSheet(); render(); toast(lib.nm+' ajouté'); break; }
+    case 'cancelsession': { DB.sport.active=null; restEnd=null; state.sub={kind:'sport'}; render(); toast('Séance annulée'); break; }
+    case 'restadd': if(restEnd) restEnd+=15000; sportTick(); break;
+    case 'restskip': { restEnd=null; const rb=$('#restBar'); if(rb) rb.remove(); break; }
+    case 'finishworkout': {
+      const a=DB.sport.active; if(!a) break;
+      const v=vol(a.ex), sets=setsDone(a.ex), dur=fmtDur(Date.now()-a.started);
+      DB.sport.history.unshift({date:"Aujourd'hui",nm:a.nm,vol:v,sets,dur});
+      const act=DB.actions.find(x=>x.type==='workout'); if(act) act.done=true;
+      DB.sport.active=null; restEnd=null; state.sub={kind:'sport'}; render();
+      toast('Séance enregistrée · '+v.toLocaleString('fr-FR')+' kg · '+sets+' séries'); break;
+    }
+    case 'addfood': { const m=DB.nutrition.meals[+el.dataset.m]; m.items.push({f:'Aliment ajouté',k:250,p:20}); render(); toast('Aliment ajouté au journal'); break; }
+
+    case 'copysys': {
+      const sys=[...DB.systems,...DB.publicSystems].find(x=>x.id===id);
+      instantiateSystem(sys);
+      closeSheet(); state.screen='dashboard'; state.sub=null; render();
+      toast('Système « '+(sys?sys.name:'')+' » copié · objectifs et habitudes créés'); break;
+    }
+    case 'acta': { const [k,v]=id.split('|'); if(k==='copysys'){const sys=[...DB.systems,...DB.publicSystems].find(x=>x.id===v); toast('Système « '+(sys?sys.name:'')+' » ajouté à ton cycle');} else if(k==='addrout'){toast('Routine ajoutée à ton cycle');} else if(k==='track'){state.screen='systeme';sysTab='trackers';render();} else toast('Habitude ajoutée'); break; }
+
+    case 'docheckin': { const o=DB.objectives.find(x=>x.id===id); const v=parseFloat($('#ciVal').value); if(!isNaN(v)){ o.current=v; recomputeProg(o); } closeSheet(); render(); toast('Valeur mise à jour · '+objResult(o)); break; }
+    case 'dorelapse': { const ad=DB.addiction; ad.best=Math.max(ad.best,ad.clean); ad.relapses++; ad.clean=0; ad.log=[]; const a=DB.actions.find(x=>x.type==='addiction'); if(a){ a.done=false; actObjIds(a).forEach(oid=>{ const o=DB.objectives.find(x=>x.id===oid); if(o&&o.type==='streak'){ o.current=0; recomputeProg(o); } }); } closeSheet(); state.sub={kind:'addiction'}; render(); toast(ad.best>0?'Noté. Ton record de '+ad.best+' jours reste acquis — on repart.':'Noté. On repart — sans jugement.'); break; }
+    case 'savenote': closeSheet(); toast('Note enregistrée'); break;
+
+    case 'toggle-public': DB.profile.public=!DB.profile.public; render(); break;
+    case 'toggle-copy': el.classList.toggle('on'); break;
+    case 'showtoggle': DB.profile.show[id]=!DB.profile.show[id]; render(); break;
+
+    case 'obnext': if(state.ob.step===0){state.ob.step=1;} else {state.ob.step=clamp(state.ob.step+1,1,4);} render(); break;
+    case 'obback': {
+      if(state.ob.step===3 && state.ob.mode && state.ob.mode!=='scratch'){ state.ob.mode=null; state.ob.aiBlocks=null; }
+      else { state.ob.step=clamp(state.ob.step-1,1,4); if(state.ob.step===3 && state.ob.mode==='scratch'){ state.ob.mode=null; } }
+      render(); break;
+    }
+    case 'obskip': state.onboarded=true; state.screen='dashboard'; render(); break;
+    case 'obselect': { const s=state.ob.step; if(s===1)state.ob.cycle=id; else if(s===3){ state.ob.system=id; state.ob.aiBlocks=null; } render(); setTimeout(()=>{ if(state.ob.step===s){ state.ob.step=clamp(s+1,1,4); render(); } },240); break; }
+    case 'obmode': {
+      state.ob.mode=id;
+      if(id==='scratch'){ state.ob.system='scratch'; state.ob.aiBlocks=null; render();
+        setTimeout(()=>{ if(state.ob.step===3){ state.ob.step=4; render(); } },240); }
+      else render();
+      break;
+    }
+    case 'obmodeback': { state.ob.mode=null; state.ob.system=null; state.ob.aiBlocks=null; render(); break; }
+    case 'obpropose': { const ti=$('#obText'); state.ob.text=ti?ti.value:''; const r=assistantEngine(state.ob.text); state.ob.aiBlocks=r.blocks; state.ob.aiMatched=r.matched; state.ob.step=4; render(); break; }
+    case 'obsugg': { state.ob.text=id; const r=assistantEngine(id); state.ob.aiBlocks=r.blocks; state.ob.aiMatched=r.matched; state.ob.step=4; render(); break; }
+    case 'obdom': { const d=state.ob.domains; const i=d.indexOf(id); if(i<0){ if(d.length>=4){ toast('4 domaines, c\u2019est déjà bien pour démarrer. Retire-en un pour en ajouter un autre.'); break; } d.push(id); } else d.splice(i,1); render(); break; }
+    case 'obfinish': {
+      state.onboarded=true; state.screen='dashboard';
+      if(state.ob.cycle){DB.cycle.total=+state.ob.cycle; DB.cycle.day=1;}
+      let firstId=null;
+      if(state.ob.aiBlocks && state.ob.aiBlocks.length){ firstId=instantiateBlocks(state.ob.aiBlocks); }
+      else if(state.ob.system && state.ob.system!=='scratch'){ const sys=DB.systems.find(x=>x.id===state.ob.system); if(sys) firstId=instantiateSystem(sys); }
+      toast(firstId ? 'Cycle lancé · ton système est prêt. Coche ta première action.' : 'Cycle lancé. Construis ton premier objectif quand tu veux.');
+      render(); break;
+    }
+
+    case 'reset': location.reload(); break;
+    case 'toast': toast(id); break;
+  }
+});
+
+/* number inputs in sport tracker */
+/* ============================================================
+   SWIPE — révéler Modifier / Supprimer sur une habitude
+   ============================================================ */
+const SWIPE_MAX=150, SWIPE_TRIGGER=52;
+let swStart=null, swWrap=null, swMoved=false;
+function closeSwipes(except){
+  document.querySelectorAll('.swipe-wrap.open').forEach(w=>{ if(w!==except) w.classList.remove('open'); });
+  document.querySelectorAll('.swipe-face').forEach(f=>{ f.style.transform=''; });
+}
+function swipeStart(x,y,target){
+  const wrap=target.closest && target.closest('.swipe-wrap');
+  if(!wrap){ closeSwipes(); return; }
+  swStart={x,y}; swWrap=wrap; swMoved=false;
+}
+function swipeMove(x,y){
+  if(!swStart||!swWrap) return false;
+  const dx=x-swStart.x, dy=y-swStart.y;
+  if(Math.abs(dy)>Math.abs(dx)) return false;      // défilement vertical : on laisse passer
+  if(Math.abs(dx)<6) return false;
+  swMoved=true;
+  const face=swWrap.querySelector('.swipe-face');
+  const off=Math.max(-SWIPE_MAX, Math.min(0, dx));  // uniquement vers la gauche
+  if(face) face.style.transform='translateX('+off+'px)';
+  return true;
+}
+function swipeEnd(){
+  if(!swWrap){ swStart=null; return; }
+  const face=swWrap.querySelector('.swipe-face');
+  const cur=face?(new w3Matrix(face.style.transform)).x:0;
+  if(cur<=-SWIPE_TRIGGER){ closeSwipes(swWrap); swWrap.classList.add('open'); if(face) face.style.transform=''; }
+  else { swWrap.classList.remove('open'); if(face) face.style.transform=''; }
+  swStart=null; swWrap=null;
+  // le drapeau ne doit avaler que le clic immédiat du geste, pas le suivant
+  if(swMoved) setTimeout(()=>{ swMoved=false; },0);
+}
+function w3Matrix(t){ const m=/translateX\((-?\d+(?:\.\d+)?)px\)/.exec(t||''); return {x:m?parseFloat(m[1]):0}; }
+document.addEventListener('touchstart',e=>{ const t=e.touches[0]; swipeStart(t.clientX,t.clientY,e.target); },{passive:true});
+document.addEventListener('touchmove',e=>{ const t=e.touches[0]; swipeMove(t.clientX,t.clientY); },{passive:true});
+document.addEventListener('touchend',swipeEnd,{passive:true});
+document.addEventListener('mousedown',e=>swipeStart(e.clientX,e.clientY,e.target));
+document.addEventListener('mousemove',e=>{ if(swStart) swipeMove(e.clientX,e.clientY); });
+document.addEventListener('mouseup',swipeEnd);
+
+document.addEventListener('input',e=>{
+  const el=findAct(e); if(!el) return;
+  if(el.dataset.act==='setval'){ const s=DB.sport.active.ex[+el.dataset.e].sets[+el.dataset.s]; const f=el.dataset.f; s[f]=parseFloat(el.value)||0; }
+  if(el.dataset.act==='freeprog'){ const o=DB.objectives.find(x=>x.id===el.dataset.id); o.progress=+el.value; }
+  if(el.dataset.act==='manualset'){ const o=DB.objectives.find(x=>x.id===el.dataset.id); o.current=+el.value; recomputeProg(o); const g=$('.gz-v.gold'); if(g)g.textContent=objProg(o)+'%'; const fills=document.querySelectorAll('.bar.gold > i'); fills.forEach(f=>f.style.width=objProg(o)+'%'); const card=el.closest('.card'); if(card){const big=card.querySelector('.mono');if(big)big.textContent=(o.current||0)+'%';} }
+  if(el.dataset.act==='exsearch'){ const q=el.value.toLowerCase().trim();
+    document.querySelectorAll('.libitem').forEach(it=>{ it.style.display=it.dataset.name.includes(q)?'':'none'; });
+    document.querySelectorAll('.libgrp').forEach(g=>{ let n=g.nextElementSibling,vis=false; while(n&&!n.classList.contains('libgrp')){ if(n.classList.contains('libitem')&&n.style.display!=='none')vis=true; n=n.nextElementSibling;} g.style.display=vis?'':'none'; }); }
+  if(el.dataset.act==='objnameinput'){
+    if(tmpObj){ tmpObj.name=el.value;
+      if(!tmpObj.typeManual && el.value.trim().length>2){
+        const guess=guessObjType(el.value); tmpObj.type=guess;
+        document.querySelectorAll('#objTypeChips .chip').forEach(c=>c.classList.toggle('on',c.dataset.id===guess));
+        const wrap=$('#objTargetWrap'), noteEl=$('#objTypeNote'), hint=$('#objTypeHint');
+        const needTarget=(guess!=='etapes'&&guess!=='manuel');
+        if(wrap) wrap.style.display=needTarget?'flex':'none';
+        if(noteEl){ noteEl.style.display=needTarget?'none':'block'; noteEl.textContent = guess==='manuel'?'Tu estimeras l\u2019avancement avec un curseur.':'Tu ajouteras les étapes ensuite, dans l\u2019objectif.'; }
+        if(hint) hint.style.display='inline';
+      }
+    }
+  }
+});
+
+/* ============================================================
+   INIT
+   ============================================================ */
+DB.objectives.forEach(recomputeProg);
+render();
+</script>
+</body>
+</html>

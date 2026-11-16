@@ -1,0 +1,117 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>ELYOS — Built in silence. Worn with intent.</title>
+<meta name="description" content="ELYOS. Drop 01 en Onyx : hoodie, jogging, cargo et short. Built in silence. Worn with intent.">
+<meta name="theme-color" content="#c8c6c1" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#292927" media="(prefers-color-scheme: dark)">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="ELYOS">
+<meta property="og:title" content="ELYOS — Drop 01">
+<meta property="og:description" content="Built in silence. Worn with intent.">
+<meta property="og:image" content="assets/og.jpg">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:locale" content="fr_FR">
+<meta name="twitter:card" content="summary_large_image">
+<link rel="icon" href="favicon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@100..125,300..500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/main.css">
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"Organization","name":"ELYOS","slogan":"Built in silence. Worn with intent."}
+</script>
+<noscript><style>.rv{clip-path:none}</style></noscript>
+<style>
+.ph{display:none}
+dl>div:has(dd>.ph:only-child){display:none}
+.soon{opacity:.6}
+#pf-back{position:fixed;left:16px;bottom:16px;z-index:9999;background:#f4f4f2;color:#111;font:500 13px/1.3 Archivo,system-ui,sans-serif;padding:9px 14px;border-radius:999px;text-decoration:none;box-shadow:0 6px 20px rgba(0,0,0,.25)}
+#pf-back:hover{background:#fff}
+</style>
+</head>
+<body><a id="pf-back" href="../projet-elyos.html">← Portfolio · site réalisé par Yohann Da Fonseca, marque en pause</a>
+<!-- Monogramme ELYOS : un seul tracé, réutilisé partout via <use href="#mark"> -->
+<svg width="0" height="0" style="position:absolute" aria-hidden="true"><symbol id="mark" viewBox="110 96 286 314"><path fill="currentColor" d="M389.5 105 334.2 120 233 229.2l14.5 21.5L199 289.2l1.2 109.6 29.6 4.7 11-109.3zM214.5 102 117 164.2v143.6l105.8-58.3-19.3-26.5-47.5 28L153.8 179.2z"/></symbol></svg>
+<button class="skip" id="skip">Aller au contenu</button>
+
+<header class="nav" id="nav">
+  <div class="nav__in">
+    <a href="#/" class="nav__brand" aria-label="ELYOS, accueil"><svg class="mark" aria-hidden="true"><use href="#mark"/></svg><span class="wm">Elyos</span></a>
+    <nav aria-label="Navigation principale">
+      <ul class="nav__links">
+        <li><a href="#/shop" data-nav="shop">Shop</a></li>
+        <li><a href="#/collection" data-nav="collection">Collection</a></li>
+        <li><a href="#/maison" data-nav="maison">Maison</a></li>
+        <li><a href="#/journal" data-nav="journal">Journal</a></li>
+        <li><a href="#/contact" data-nav="contact">Contact</a></li>
+      </ul>
+    </nav>
+    <div class="nav__right">
+      <button class="nav__cart" id="cartBtn" aria-haspopup="dialog" aria-controls="cart">Panier (<span class="n" data-count>0</span>)</button>
+      <button class="nav__burger" id="burger" aria-expanded="false" aria-controls="menu">Menu</button>
+    </div>
+  </div>
+</header>
+
+<div class="menu" id="menu" role="dialog" aria-modal="true" aria-label="Menu">
+  <div class="menu__top"><span class="nav__brand"><svg class="mark" aria-hidden="true"><use href="#mark"/></svg><span class="wm">Elyos</span></span><button id="menuClose">Fermer</button></div>
+  <nav aria-label="Menu mobile">
+    <a href="#/shop" data-nav="shop">Shop</a>
+    <a href="#/collection" data-nav="collection">Collection</a>
+    <a href="#/maison" data-nav="maison">Maison</a>
+    <a href="#/journal" data-nav="journal">Journal</a>
+    <a href="#/contact" data-nav="contact">Contact</a>
+  </nav>
+  <div class="menu__foot"><span>Built in silence.<br>Worn with intent.</span><button data-open-cart>Panier (<span data-count>0</span>)</button></div>
+</div>
+
+<!-- Chaque page est rendue ici par js/app.js -->
+<main id="app" tabindex="-1"></main>
+
+<footer class="foot" id="foot">
+  <div class="foot__grid">
+    <h2 class="t2">Être prévenu de la sortie du Drop 01.</h2>
+    <div class="news">
+      <label for="mail">Adresse e-mail</label>
+      <div class="news__row"><input id="mail" type="email" autocomplete="email" inputmode="email" placeholder="toi@exemple.fr"><button id="sub">S'inscrire</button></div>
+      <p class="news__msg" id="newsMsg" aria-live="polite"></p>
+    </div>
+    <div class="foot__cols">
+      <div><h3>Boutique</h3><a href="#/shop">Shop</a><a href="#/collection">Collection</a><button data-open-cart class="foot__btn">Panier</button></div>
+      <div><h3>Maison</h3><a href="#/maison">À propos</a><a href="#/journal">Journal</a><a href="#/contact">Contact</a></div>
+      <div><h3>Aide</h3><a href="#/info/livraison-retours">Livraison et retours</a><a href="#/info/guide-des-tailles">Guide des tailles</a></div>
+      <div id="socialCol"><h3>Suivre</h3></div>
+    </div>
+  </div>
+  <div class="wm foot__mark" aria-hidden="true">Elyos</div>
+  <div class="foot__legal">
+    <span class="foot__id"><svg class="mark" aria-hidden="true"><use href="#mark"/></svg>© <span id="year">2026</span> ELYOS</span>
+    <nav aria-label="Informations légales"><a href="#/info/mentions-legales">Mentions légales</a><a href="#/info/cgv">CGV</a><a href="#/info/confidentialite">Confidentialité</a></nav>
+  </div>
+</footer>
+
+<!-- Transition de page : un faisceau de béton en diagonale -->
+<div class="curtain" id="curtain" aria-hidden="true"><div class="curtain__b"></div></div>
+
+<div class="veil" id="veil"></div>
+<aside class="cart" id="cart" role="dialog" aria-modal="true" aria-labelledby="cartTitle">
+  <div class="cart__head"><span id="cartTitle">Panier (<span data-count>0</span>)</span><button id="cartClose">Fermer</button></div>
+  <div class="cart__list" id="cartList"></div>
+  <div class="cart__foot">
+    <div class="cart__total"><span>Sous-total</span><span id="cartTotal">0 €</span></div>
+    <button class="btn" id="checkout">Commander</button>
+    <p class="cart__msg" id="cartMsg" aria-live="polite"></p>
+  </div>
+</aside>
+
+<div class="lb" id="lb" role="dialog" aria-modal="true" aria-label="Image agrandie"><button id="lbClose">Fermer</button><img alt=""></div>
+
+<script src="js/data.js"></script>
+<script src="js/app.js"></script>
+</body>
+</html>

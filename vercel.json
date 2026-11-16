@@ -1,0 +1,30 @@
+{
+  "redirects": [
+    {
+      "source": "/projet-spa-logo.html",
+      "destination": "/projet-saint-paul-des-arts.html",
+      "permanent": true
+    },
+    {
+      "source": "/projet-spa-escape.html",
+      "destination": "/projet-saint-paul-des-arts.html",
+      "permanent": true
+    },
+    {
+      "source": "/projet-winzoria-strat.html",
+      "destination": "/projet-winzoria.html",
+      "permanent": true
+    },
+    {
+      "source": "/projet-autres-creations.html",
+      "destination": "/#projets",
+      "permanent": true
+    },
+    {
+      "source": "/elyos-vitrine/:path*",
+      "destination": "/elyos-site/index.html",
+      "permanent": true
+    }
+  ],
+  "cleanUrls": false
+}
